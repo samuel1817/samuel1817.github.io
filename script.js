@@ -1,674 +1,1077 @@
-const STORAGE_KEY = 'personal-dashboard-state-v1';
+const STORAGE_KEY = "personal-dashboard-state-v1";
 
-const defaultLinks = [
-    { id: createId(), title: 'GitHub', url: '[https://github.com](https://github.com)', icon: 'fab fa-github' },
-    { id: createId(), title: 'Gmail', url: '[https://gmail.com](https://gmail.com)', icon: 'fab fa-google' },
-    { id: createId(), title: 'YouTube', url: '[https://youtube.com](https://youtube.com)', icon: 'fab fa-youtube' },
-    { id: createId(), title: 'Twitter', url: '[https://twitter.com](https://twitter.com)', icon: 'fab fa-twitter' }
-];
-
-const defaultState = {
-    theme: 'dark',
-    background: 'gradient-1',
-    accent: '#3498db',
-    links: defaultLinks,
-    notes: [],
-    tasks: []
+const DEFAULT_STATE = {
+  theme: "dark",
+  background: "gradient-1",
+  accent: "#8b5cf6",
+  links: [
+    {
+      id: "github",
+      title: "GitHub",
+      url: "https://github.com/",
+      icon: "💻"
+    },
+    {
+      id: "gmail",
+      title: "Gmail",
+      url: "https://mail.google.com/",
+      icon: "✉️"
+    },
+    {
+      id: "youtube",
+      title: "YouTube",
+      url: "https://www.youtube.com/",
+      icon: "▶️"
+    },
+    {
+      id: "twitter",
+      title: "Twitter",
+      url: "https://twitter.com/",
+      icon: "𝕏"
+    }
+  ],
+  notes: [],
+  tasks: [],
+  timer: {
+    minutes: 0,
+    seconds: 0
+  }
 };
 
-let dashboardState = loadState();
+let state = loadState();
+let timerInterval = null;
+let timerRemaining = 0;
+let timerRunning = false;
 
-document.addEventListener('DOMContentLoaded', init);
 
-function createId() {
-    return (Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function $(selector) {
+  return document.querySelector(selector);
 }
 
-function loadState() {
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return structuredClone(defaultState);
+function $all(selector) {
+  return document.querySelectorAll(selector);
+}
 
-        const parsed = JSON.parse(saved);
-        return {
-            theme: parsed.theme || defaultState.theme,
-            background: parsed.background || defaultState.background,
-            accent: parsed.accent || defaultState.accent,
-            links: Array.isArray(parsed.links) && parsed.links.length ? parsed.links : defaultState.links,
-            notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-            tasks: Array.isArray(parsed.tasks) ? parsed.tasks : []
-        };
-    } catch (error) {
-        console.warn('Failed to load saved dashboard state:', error);
-        return structuredClone(defaultState);
-    }
+function escapeHTML(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dashboardState));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error("Nepodarilo sa uložiť dáta:", error);
+  }
 }
 
-function init() {
-    applyTheme();
-    applyBackground();
-    applyAccent();
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
 
-    setupSectionNavigation();
-    setupSidebarToggle();
+    if (!saved) {
+      return structuredClone(DEFAULT_STATE);
+    }
 
-    setupSearch();
-    setupClock();
-    setupTimer();
+    const parsed = JSON.parse(saved);
 
-    setupQuickLinks();
-    setupNotes();
-    setupTasks();
-    setupSettings();
-
-    renderAll();
+    return {
+      ...structuredClone(DEFAULT_STATE),
+      ...parsed,
+      links: Array.isArray(parsed.links)
+        ? parsed.links
+        : structuredClone(DEFAULT_STATE.links),
+      notes: Array.isArray(parsed.notes)
+        ? parsed.notes
+        : [],
+      tasks: Array.isArray(parsed.tasks)
+        ? parsed.tasks
+        : []
+    };
+  } catch (error) {
+    console.error("Nepodarilo sa načítať uložené dáta:", error);
+    return structuredClone(DEFAULT_STATE);
+  }
 }
 
-function setupSectionNavigation() {
-    const navButtons = document.querySelectorAll('.nav-item');
-    const sections = document.querySelectorAll('.section');
 
-    navButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            const sectionName = button.dataset.section;
-            setActiveSection(sectionName);
+/* =========================================================
+   CLOCK + DATE
+========================================================= */
 
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar && window\.innerWidth <= 768) {
-                sidebar.classList.remove('open');
-            }
-        });
-    });
+function updateClock() {
+  const now = new Date();
 
-    function setActiveSection(sectionName) {
-        const titleMap = {
-            dashboard: 'Dashboard',
-            'quick-links': 'Quick Links',
-            notes: 'Notes',
-            tasks: 'Tasks',
-            settings: 'Settings'
-        };
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
 
-        navButtons.forEach((button) => {
-            button.classList.toggle('active', button.dataset.section === sectionName);
-        });
+  const timeString = `${hours}:${minutes}:${seconds}`;
 
-        sections.forEach((section) => {
-            section.classList.toggle('active', section.id === \`${sectionName}-section\`);
-        });
+  const clock =
+    document.querySelector("#clock") ||
+    document.querySelector(".clock");
 
-        const sectionTitle = document.getElementById('sectionTitle');
-        if (sectionTitle) {
-            sectionTitle.textContent = titleMap[sectionName] || 'Dashboard';
-        }
-    }
+  if (clock) {
+    clock.textContent = timeString;
+  }
 
-    const defaultSection = 'dashboard';
-    setActiveSection(defaultSection);
+  let dateElement =
+    document.querySelector("#date") ||
+    document.querySelector(".date");
+
+  /*
+   * Ak HTML nemá prvok pre dátum,
+   * vytvoríme ho automaticky pod hodinami.
+   */
+  if (!dateElement && clock) {
+    dateElement = document.createElement("div");
+    dateElement.className = "date";
+    dateElement.id = "date";
+
+    clock.insertAdjacentElement("afterend", dateElement);
+  }
+
+  if (dateElement) {
+    const formattedDate = new Intl.DateTimeFormat("sk-SK", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(now);
+
+    dateElement.textContent =
+      formattedDate.charAt(0).toUpperCase() +
+      formattedDate.slice(1);
+  }
 }
 
-function setupSidebarToggle() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+function startClock() {
+  updateClock();
 
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            if (sidebar) {
-                sidebar.classList.toggle('open');
-            }
-        });
-    }
-
-    if (mobileSidebarToggle) {
-        mobileSidebarToggle.addEventListener('click', () => {
-            if (sidebar) {
-                sidebar.classList.toggle('open');
-            }
-        });
-    }
-
-    window\.addEventListener('resize', () => {
-        if (window\.innerWidth > 768 && sidebar) {
-            sidebar.classList.remove('open');
-        }
-    });
+  setInterval(updateClock, 1000);
 }
 
-function setupSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
 
-    function performSearch() {
-        const query = searchInput?.value.trim();
-        if (!query) return;
+/* =========================================================
+   SEARCH
+========================================================= */
 
-        let url = '';
+function performSearch() {
+  const input =
+    document.querySelector("#searchInput") ||
+    document.querySelector(".search-input") ||
+    document.querySelector('input[type="search"]');
 
-        if (/^https?:\\\\/\\\\//i.test(query)) {
-            url = query;
-        } else if (/^[\\\w\.-]+\\\\.[a-z]{2,}(\\\\/.\*)?$/i.test(query)) {
-            url = query.startsWith('www.') ? \`https\://${query}\` : \`https\://${query}\`;
-        } else {
-            url = \`[https://www.google.com/search?q=${encodeURIComponent(query)](https://www.google.com/search?q=${encodeURIComponent\(query\))}\`;
-        }
+  if (!input) return;
 
-        window\.open(url, '\_blank', 'noopener,noreferrer');
-    }
+  const query = input.value.trim();
 
-    searchBtn?.addEventListener('click', performSearch);
-    searchInput?.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            performSearch();
-        }
-    });
+  if (!query) return;
+
+  let destination;
+
+  if (
+    query.startsWith("http://") ||
+    query.startsWith("https://") ||
+    query.startsWith("www.")
+  ) {
+    destination = query.startsWith("www.")
+      ? `https://${query}`
+      : query;
+  } else if (
+    query.includes(".") &&
+    !query.includes(" ")
+  ) {
+    destination = `https://${query}`;
+  } else {
+    destination =
+      `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  }
+
+  window.location.href = destination;
 }
 
-function setupClock() {
-    const clockEl = document.getElementById('clock');
-    const dateEl = document.getElementById('date');
+function initSearch() {
+  const input =
+    document.querySelector("#searchInput") ||
+    document.querySelector(".search-input") ||
+    document.querySelector('input[type="search"]');
 
-    function updateClock() {
-        const now = new Date();
-        const time = now\.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-        const dateText = now\.toLocaleDateString([], {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+  if (!input) return;
 
-        if (clockEl) clockEl.textContent = time;
-        if (dateEl) dateEl.textContent = dateText;
+  input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      performSearch();
     }
+  });
 
-    updateClock();
-    setInterval(updateClock, 1000);
+  const button =
+    document.querySelector("#searchButton") ||
+    document.querySelector(".search-button");
+
+  if (button) {
+    button.addEventListener("click", performSearch);
+  }
 }
 
-function setupTimer() {
-    let timerInterval = null;
-    let remainingSeconds = 0;
 
-    const timerDisplay = document.getElementById('timerDisplay');
-    const timerMinutes = document.getElementById('timerMinutes');
-    const timerSeconds = document.getElementById('timerSeconds');
-    const timerStart = document.getElementById('timerStart');
-    const timerPause = document.getElementById('timerPause');
-    const timerReset = document.getElementById('timerReset');
-
-    function formatTime(totalSeconds) {
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return \`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}\`;
-    }
-
-    function updateDisplay() {
-        if (timerDisplay) {
-            timerDisplay.textContent = formatTime(remainingSeconds);
-        }
-    }
-
-    function stopTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-    }
-
-    function startTimer() {
-        if (timerInterval) return;
-
-        const minutes = Number(timerMinutes?.value || 0);
-        const seconds = Number(timerSeconds?.value || 0);
-
-        if (remainingSeconds <= 0) {
-            remainingSeconds = minutes \* 60 + seconds;
-        }
-
-        if (remainingSeconds <= 0) {
-            return;
-        }
-
-        timerInterval = setInterval(() => {
-            if (remainingSeconds > 0) {
-                remainingSeconds -= 1;
-                updateDisplay();
-            } else {
-                stopTimer();
-                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-                    new Notification('Timer complete!');
-                }
-                if (timerDisplay) {
-                    timerDisplay.textContent = '00:00';
-                }
-            }
-        }, 1000);
-
-        updateDisplay();
-    }
-
-    function pauseTimer() {
-        stopTimer();
-    }
-
-    function resetTimer() {
-        stopTimer();
-        remainingSeconds = 0;
-        if (timerMinutes) timerMinutes.value = '';
-        if (timerSeconds) timerSeconds.value = '';
-        updateDisplay();
-    }
-
-    timerStart?.addEventListener('click', startTimer);
-    timerPause?.addEventListener('click', pauseTimer);
-    timerReset?.addEventListener('click', resetTimer);
-
-    const defaultMinutes = 25;
-    if (timerMinutes) timerMinutes.value = defaultMinutes;
-    remainingSeconds = defaultMinutes \* 60;
-    updateDisplay();
-}
-
-function setupQuickLinks() {
-    const addLinkBtn = document.getElementById('addLinkBtn');
-    const addLinkForm = document.getElementById('addLinkForm');
-    const cancelLinkBtn = document.getElementById('cancelLinkBtn');
-    const linksList = document.getElementById('linksList');
-    const linksPreview = document.getElementById('linksPreview');
-
-    addLinkBtn?.addEventListener('click', () => {
-        addLinkForm?.classList.remove('hidden');
-    });
-
-    cancelLinkBtn?.addEventListener('click', () => {
-        addLinkForm?.classList.add('hidden');
-        addLinkForm?.reset();
-    });
-
-    addLinkForm?.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        const linkTitle = document.getElementById('linkTitle')?.value.trim();
-        const linkUrl = document.getElementById('linkUrl')?.value.trim();
-        const linkIcon = document.getElementById('linkIcon')?.value.trim();
-
-        if (!linkTitle || !linkUrl) return;
-
-        const normalizedUrl = /^https?:\\\\/\\\\//i.test(linkUrl) ? linkUrl : \`https\://${linkUrl}\`;
-
-        dashboardState.links.push({
-            id: createId(),
-            title: linkTitle,
-            url: normalizedUrl,
-            icon: linkIcon || 'fas fa-link'
-        });
-
-        saveState();
-        renderLinks();
-        addLinkForm.reset();
-        addLinkForm.classList.add('hidden');
-    });
-
-    linksList?.addEventListener('click', (event) => {
-        const target = event.target.closest('.item-delete');
-        if (!target) return;
-
-        const id = target.dataset.id;
-        dashboardState.links = dashboardState.links.filter(link => link.id !== id);
-        saveState();
-        renderLinks();
-    });
-
-    renderLinks();
-}
-
-function renderLinks() {
-    const linksList = document.getElementById('linksList');
-    const linksPreview = document.getElementById('linksPreview');
-
-    if (linksList) {
-        linksList.innerHTML = dashboardState.links.length
-            ? dashboardState.links.map((link) => \`
-                \<div class=\\"item-card\\">
-                    \<button class=\\"item-delete\\" data-id=\\"${link.id}\\" aria-label=\\"Delete ${link.title}\\">&times;\</button>
-                    \<i class=\\"${link.icon || 'fas fa-link'}\\">\</i>
-                    \<a href=\\"${link.url}\\" target=\\"\_blank\\" rel=\\"noopener noreferrer\\">${link.title}\</a>
-                \</div>
-            \`).join('')
-            : '\<p class=\\"empty-message\\">No links saved yet.\</p>';
-    }
-
-    if (linksPreview) {
-        const previewLinks = dashboardState.links.slice(0, 4);
-
-        linksPreview\.innerHTML = previewLinks.length
-            ? previewLinks.map((link) => \`
-                \<a href=\\"${link.url}\\" target=\\"\_blank\\" rel=\\"noopener noreferrer\\">
-                    \<i class=\\"${link.icon || 'fas fa-link'}\\">\</i>
-                    \<span>${link.title}\</span>
-                \</a>
-            \`).join('')
-            : '\<p class=\\"empty-message\\">No links yet\</p>';
-    }
-}
-
-function setupNotes() {
-    const addNoteBtn = document.getElementById('addNoteBtn');
-    const addNoteForm = document.getElementById('addNoteForm');
-    const cancelNoteBtn = document.getElementById('cancelNoteBtn');
-    const notesList = document.getElementById('notesList');
-    const notesPreview = document.getElementById('notesPreview');
-
-    addNoteBtn?.addEventListener('click', () => {
-        addNoteForm?.classList.remove('hidden');
-    });
-
-    cancelNoteBtn?.addEventListener('click', () => {
-        addNoteForm?.classList.add('hidden');
-        addNoteForm?.reset();
-    });
-
-    addNoteForm?.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        const title = document.getElementById('noteTitle')?.value.trim();
-        const content = document.getElementById('noteContent')?.value.trim();
-
-        if (!title || !content) return;
-
-        dashboardState.notes.unshift({
-            id: createId(),
-            title,
-            content,
-            createdAt: new Date().toISOString()
-        });
-
-        saveState();
-        renderNotes();
-        addNoteForm.reset();
-        addNoteForm.classList.add('hidden');
-    });
-
-    notesList?.addEventListener('click', (event) => {
-        const target = event.target.closest('.note-delete');
-        if (!target) return;
-
-        const id = target.dataset.id;
-        dashboardState.notes = dashboardState.notes.filter(note => note.id !== id);
-        saveState();
-        renderNotes();
-    });
-
-    renderNotes();
-}
-
-function renderNotes() {
-    const notesList = document.getElementById('notesList');
-    const notesPreview = document.getElementById('notesPreview');
-
-    if (notesList) {
-        notesList.innerHTML = dashboardState.notes.length
-            ? dashboardState.notes.map((note) => \`
-                \<div class=\\"note-item\\">
-                    \<button class=\\"note-delete\\" data-id=\\"${note.id}\\" aria-label=\\"Delete ${note.title}\\">&times;\</button>
-                    \<div class=\\"note-title\\">${note.title}\</div>
-                    \<div class=\\"note-content\\">${note.content}\</div>
-                    \<div class=\\"note-date\\">${new Date(note.createdAt).toLocaleDateString()}\</div>
-                \</div>
-            \`).join('')
-            : '\<p class=\\"empty-message\\">No notes yet.\</p>';
-    }
-
-    if (notesPreview) {
-        const previewNotes = dashboardState.notes.slice(0, 3);
-
-        notesPreview\.innerHTML = previewNotes.length
-            ? previewNotes.map((note) => \`
-                \<div class=\\"preview-item\\">${note.title}\</div>
-            \`).join('')
-            : '\<p class=\\"empty-message\\">No notes yet\</p>';
-    }
-}
-
-function setupTasks() {
-    const addTaskBtn = document.getElementById('addTaskBtn');
-    const addTaskForm = document.getElementById('addTaskForm');
-    const cancelTaskBtn = document.getElementById('cancelTaskBtn');
-    const tasksList = document.getElementById('tasksList');
-    const tasksPreview = document.getElementById('tasksPreview');
-
-    addTaskBtn?.addEventListener('click', () => {
-        addTaskForm?.classList.remove('hidden');
-    });
-
-    cancelTaskBtn?.addEventListener('click', () => {
-        addTaskForm?.classList.add('hidden');
-        addTaskForm?.reset();
-    });
-
-    addTaskForm?.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        const title = document.getElementById('taskTitle')?.value.trim();
-        const description = document.getElementById('taskDescription')?.value.trim();
-        const priority = document.getElementById('taskPriority')?.value || 'medium';
-
-        if (!title) return;
-
-        dashboardState.tasks.unshift({
-            id: createId(),
-            title,
-            description,
-            priority,
-            completed: false,
-            createdAt: new Date().toISOString()
-        });
-
-        saveState();
-        renderTasks();
-        addTaskForm.reset();
-        addTaskForm.classList.add('hidden');
-    });
-
-    tasksList?.addEventListener('click', (event) => {
-        const deleteBtn = event.target.closest('.task-delete');
-        const checkbox = event.target.closest('.task-checkbox');
-
-        if (deleteBtn) {
-            const id = deleteBtn.dataset.id;
-            dashboardState.tasks = dashboardState.tasks.filter(task => task.id !== id);
-            saveState();
-            renderTasks();
-            return;
-        }
-
-        if (checkbox) {
-            const id = checkbox.dataset.id;
-            dashboardState.tasks = dashboardState.tasks.map(task => {
-                if (task.id === id) {
-                    return { ...task, completed: checkbox.checked };
-                }
-                return task;
-            });
-
-            saveState();
-            renderTasks();
-        }
-    });
-
-    renderTasks();
-}
-
-function renderTasks() {
-    const tasksList = document.getElementById('tasksList');
-    const tasksPreview = document.getElementById('tasksPreview');
-
-    if (tasksList) {
-        tasksList.innerHTML = dashboardState.tasks.length
-            ? dashboardState.tasks.map((task) => \`
-                \<div class=\\"task-item ${task.completed ? 'completed' : ''}\\">
-                    \<input
-                        class=\\"task-checkbox\\"
-                        type=\\"checkbox\\"
-                        ${task.completed ? 'checked' : ''}
-                        data-id=\\"${task.id}\\"
-                        aria-label=\\"Toggle task ${task.title}\\"
-                    \>
-                    \<div class=\\"task-content\\">
-                        \<div class=\\"task-title\\">${task.title}\</div>
-                        \<div class=\\"task-description\\">${task.description || 'No description'}\</div>
-                        \<span class=\\"task-priority ${task.priority || 'medium'}\\">
-                            ${capitalize(task.priority || 'medium')}
-                        \</span>
-                    \</div>
-                    \<button class=\\"task-delete\\" data-id=\\"${task.id}\\" aria-label=\\"Delete task ${task.title}\\">&times;\</button>
-                \</div>
-            \`).join('')
-            : '\<p class=\\"empty-message\\">No tasks yet.\</p>';
-    }
-
-    if (tasksPreview) {
-        const previewTasks = dashboardState.tasks.slice(0, 3);
-
-        tasksPreview\.innerHTML = previewTasks.length
-            ? previewTasks.map((task) => \`
-                \<div class=\\"preview-item ${task.priority || 'medium'}-priority\\">
-                    ${task.title}
-                \</div>
-            \`).join('')
-            : '\<p class=\\"empty-message\\">No tasks yet\</p>';
-    }
-}
-
-function setupSettings() {
-    const themeToggle = document.getElementById('themeToggle');
-    const backgroundSelect = document.getElementById('backgroundSelect');
-    const colorSelect = document.getElementById('colorSelect');
-    const exportBtn = document.getElementById('exportBtn');
-    const importBtn = document.getElementById('importBtn');
-    const importFile = document.getElementById('importFile');
-    const resetBtn = document.getElementById('resetBtn');
-
-    themeToggle?.addEventListener('click', () => {
-        dashboardState.theme = dashboardState.theme === 'dark' ? 'light' : 'dark';
-        saveState();
-        applyTheme();
-    });
-
-    backgroundSelect?.addEventListener('change', (event) => {
-        dashboardState.background = event.target.value;
-        saveState();
-        applyBackground();
-    });
-
-    colorSelect?.addEventListener('input', (event) => {
-        dashboardState.accent = event.target.value;
-        saveState();
-        applyAccent();
-    });
-
-    exportBtn?.addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(dashboardState, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'dashboard-data.json';
-        link.click();
-        URL.revokeObjectURL(url);
-    });
-
-    importBtn?.addEventListener('click', () => {
-        importFile?.click();
-    });
-
-    importFile?.addEventListener('change', (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const parsed = JSON.parse(String(e.target?.result || '{}'));
-                dashboardState = {
-                    theme: parsed.theme || defaultState.theme,
-                    background: parsed.background || defaultState.background,
-                    accent: parsed.accent || defaultState.accent,
-                    links: Array.isArray(parsed.links) && parsed.links.length ? parsed.links : defaultState.links,
-                    notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-                    tasks: Array.isArray(parsed.tasks) ? parsed.tasks : []
-                };
-                saveState();
-                renderAll();
-                applyTheme();
-                applyBackground();
-                applyAccent();
-            } catch (error) {
-                console.error('Invalid import file', error);
-            }
-        };
-        reader.readAsText(file);
-    });
-
-    resetBtn?.addEventListener('click', () => {
-        const confirmReset = window\.confirm('Reset all saved dashboard data?');
-        if (!confirmReset) return;
-
-        dashboardState = structuredClone(defaultState);
-        saveState();
-        renderAll();
-        applyTheme();
-        applyBackground();
-        applyAccent();
-    });
-
-    applyThemeButtonState();
-    if (backgroundSelect) backgroundSelect.value = dashboardState.background;
-    if (colorSelect) colorSelect.value = dashboardState.accent;
-}
-
-function renderAll() {
-    renderLinks();
-    renderNotes();
-    renderTasks();
-    applyThemeButtonState();
-}
+/* =========================================================
+   THEME
+========================================================= */
 
 function applyTheme() {
-    const body = document.body;
-    const isDark = dashboardState.theme === 'dark';
+  document.body.classList.remove("dark", "light");
 
-    body.classList.toggle('dark-mode', isDark);
-    body.classList.toggle('light-mode', !isDark);
-    body.classList.remove('dark', 'light');
-    body.classList.add(isDark ? 'dark' : 'light');
+  if (state.theme === "light") {
+    document.body.classList.add("light");
+  } else {
+    document.body.classList.add("dark");
+  }
 
-    applyThemeButtonState();
+  const themeToggle =
+    document.querySelector("#themeToggle") ||
+    document.querySelector(".theme-toggle");
+
+  if (themeToggle) {
+    themeToggle.setAttribute(
+      "aria-label",
+      state.theme === "dark"
+        ? "Prepnúť na svetlý režim"
+        : "Prepnúť na tmavý režim"
+    );
+  }
 }
 
-function applyThemeButtonState() {
-    const themeToggle = document.getElementById('themeToggle');
-    if (!themeToggle) return;
+function toggleTheme() {
+  state.theme =
+    state.theme === "dark"
+      ? "light"
+      : "dark";
 
-    themeToggle.innerHTML = dashboardState.theme === 'dark'
-        ? '\<i class=\\"fas fa-sun\\">\</i>'
-        : '\<i class=\\"fas fa-moon\\">\</i>';
+  applyTheme();
+  saveState();
 }
+
+function initTheme() {
+  applyTheme();
+
+  const buttons = [
+    document.querySelector("#themeToggle"),
+    document.querySelector(".theme-toggle"),
+    document.querySelector("[data-action='theme']")
+  ].filter(Boolean);
+
+  buttons.forEach(button => {
+    button.addEventListener("click", toggleTheme);
+  });
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
 
 function applyBackground() {
-    const body = document.body;
-    body.classList.remove('gradient-1', 'gradient-2', 'gradient-3', 'dark', 'light');
-    body.classList.add(dashboardState.background || 'gradient-1');
+  document.body.classList.remove(
+    "gradient-1",
+    "gradient-2",
+    "gradient-3"
+  );
+
+  if (
+    state.background === "gradient-1" ||
+    state.background === "gradient-2" ||
+    state.background === "gradient-3"
+  ) {
+    document.body.classList.add(state.background);
+  }
 }
+
+function initBackground() {
+  applyBackground();
+
+  const select =
+    document.querySelector("#backgroundSelect") ||
+    document.querySelector("#background") ||
+    document.querySelector(".background-select");
+
+  if (!select) return;
+
+  select.value = state.background;
+
+  select.addEventListener("change", function () {
+    state.background = this.value;
+    applyBackground();
+    saveState();
+  });
+}
+
+
+/* =========================================================
+   ACCENT COLOR
+========================================================= */
 
 function applyAccent() {
-    document.documentElement.style.setProperty('--primary-color', dashboardState.accent || '#3498db');
+  document.documentElement.style.setProperty(
+    "--accent",
+    state.accent
+  );
 }
 
-function capitalize(value) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
+function initAccent() {
+  applyAccent();
+
+  const input =
+    document.querySelector("#accentColor") ||
+    document.querySelector('input[type="color"]');
+
+  if (!input) return;
+
+  input.value = state.accent;
+
+  input.addEventListener("input", function () {
+    state.accent = this.value;
+    applyAccent();
+    saveState();
+  });
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function initSidebar() {
+  const sidebar =
+    document.querySelector("#sidebar") ||
+    document.querySelector(".sidebar");
+
+  const toggle =
+    document.querySelector("#sidebarToggle") ||
+    document.querySelector(".sidebar-toggle");
+
+  const overlay =
+    document.querySelector("#sidebarOverlay") ||
+    document.querySelector(".sidebar-overlay");
+
+  if (toggle && sidebar) {
+    toggle.addEventListener("click", function () {
+      sidebar.classList.toggle("open");
+      sidebar.classList.toggle("collapsed");
+
+      if (overlay) {
+        overlay.classList.toggle("active");
+      }
+    });
+  }
+
+  if (overlay && sidebar) {
+    overlay.addEventListener("click", function () {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("active");
+    });
+  }
+
+  $all("[data-section]").forEach(button => {
+    button.addEventListener("click", function () {
+      const sectionId = this.dataset.section;
+      const section = document.getElementById(sectionId);
+
+      if (section) {
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+    });
+  });
+}
+
+
+/* =========================================================
+   QUICK LINKS
+========================================================= */
+
+function renderLinks() {
+  const container =
+    document.querySelector("#quickLinks") ||
+    document.querySelector(".quick-links");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  state.links.forEach(link => {
+    const element = document.createElement("div");
+
+    element.className = "quick-link";
+
+    element.innerHTML = `
+      <a
+        href="${escapeHTML(link.url)}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="quick-link-main"
+      >
+        <span class="quick-link-icon">
+          ${escapeHTML(link.icon || "🔗")}
+        </span>
+
+        <span class="quick-link-title">
+          ${escapeHTML(link.title)}
+        </span>
+      </a>
+
+      <button
+        class="delete-link"
+        data-id="${escapeHTML(link.id)}"
+        title="Odstrániť"
+        type="button"
+      >
+        ×
+      </button>
+    `;
+
+    container.appendChild(element);
+  });
+
+  $all(".delete-link").forEach(button => {
+    button.addEventListener("click", function () {
+      const id = this.dataset.id;
+
+      state.links = state.links.filter(
+        link => link.id !== id
+      );
+
+      saveState();
+      renderLinks();
+    });
+  });
+}
+
+function addLink() {
+  const titleInput =
+    document.querySelector("#linkTitle");
+
+  const urlInput =
+    document.querySelector("#linkUrl");
+
+  const iconInput =
+    document.querySelector("#linkIcon");
+
+  if (!titleInput || !urlInput) return;
+
+  const title = titleInput.value.trim();
+  const url = urlInput.value.trim();
+  const icon = iconInput
+    ? iconInput.value.trim()
+    : "🔗";
+
+  if (!title || !url) {
+    alert("Vyplň názov aj URL adresu.");
+    return;
+  }
+
+  let finalUrl = url;
+
+  if (
+    !finalUrl.startsWith("http://") &&
+    !finalUrl.startsWith("https://")
+  ) {
+    finalUrl = `https://${finalUrl}`;
+  }
+
+  state.links.push({
+    id: Date.now().toString(),
+    title,
+    url: finalUrl,
+    icon: icon || "🔗"
+  });
+
+  saveState();
+  renderLinks();
+
+  titleInput.value = "";
+  urlInput.value = "";
+
+  if (iconInput) {
+    iconInput.value = "";
+  }
+}
+
+function initLinks() {
+  renderLinks();
+
+  const addButton =
+    document.querySelector("#addLink") ||
+    document.querySelector(".add-link");
+
+  if (addButton) {
+    addButton.addEventListener("click", addLink);
+  }
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timerRemaining / 60);
+  const seconds = timerRemaining % 60;
+
+  const display =
+    document.querySelector("#timerDisplay") ||
+    document.querySelector(".timer-display") ||
+    document.querySelector(".timer");
+
+  if (!display) return;
+
+  display.textContent =
+    `${String(minutes).padStart(2, "0")}:` +
+    `${String(seconds).padStart(2, "0")}`;
+}
+
+function getTimerInputs() {
+  return {
+    minutes:
+      document.querySelector("#timerMinutes") ||
+      document.querySelector(".timer-minutes"),
+
+    seconds:
+      document.querySelector("#timerSeconds") ||
+      document.querySelector(".timer-seconds")
+  };
+}
+
+function startTimer() {
+  if (timerRunning) return;
+
+  if (timerRemaining <= 0) {
+    const inputs = getTimerInputs();
+
+    const minutes = inputs.minutes
+      ? parseInt(inputs.minutes.value, 10) || 0
+      : 0;
+
+    const seconds = inputs.seconds
+      ? parseInt(inputs.seconds.value, 10) || 0
+      : 0;
+
+    timerRemaining =
+      Math.max(0, minutes * 60 + seconds);
+  }
+
+  if (timerRemaining <= 0) return;
+
+  timerRunning = true;
+
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+
+    updateTimerDisplay();
+
+    if (timerRemaining <= 0) {
+      stopTimer();
+
+      try {
+        new Audio(
+          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="
+        ).play();
+      } catch (error) {
+        console.log("Timer skončil.");
+      }
+
+      alert("Časovač skončil!");
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (!timerRunning) return;
+
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+}
+
+function resetTimer() {
+  stopTimer();
+
+  timerRemaining = 0;
+
+  const inputs = getTimerInputs();
+
+  if (inputs.minutes) {
+    inputs.minutes.value = "";
+  }
+
+  if (inputs.seconds) {
+    inputs.seconds.value = "";
+  }
+
+  updateTimerDisplay();
+}
+
+function initTimer() {
+  updateTimerDisplay();
+
+  const start =
+    document.querySelector("#timerStart") ||
+    document.querySelector(".timer-start");
+
+  const pause =
+    document.querySelector("#timerPause") ||
+    document.querySelector(".timer-pause");
+
+  const reset =
+    document.querySelector("#timerReset") ||
+    document.querySelector(".timer-reset");
+
+  if (start) {
+    start.addEventListener("click", startTimer);
+  }
+
+  if (pause) {
+    pause.addEventListener("click", pauseTimer);
+  }
+
+  if (reset) {
+    reset.addEventListener("click", resetTimer);
+  }
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+function renderNotes() {
+  const container =
+    document.querySelector("#notesList") ||
+    document.querySelector(".notes-list");
+
+  if (!container) return;
+
+  if (state.notes.length === 0) {
+    container.innerHTML =
+      `<div class="empty-state">Žiadne poznámky.</div>`;
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  state.notes.forEach(note => {
+    const element = document.createElement("div");
+
+    element.className = "note";
+
+    element.innerHTML = `
+      <div class="note-content">
+        ${escapeHTML(note.text)}
+      </div>
+
+      <button
+        class="delete-note"
+        data-id="${escapeHTML(note.id)}"
+        type="button"
+      >
+        ×
+      </button>
+    `;
+
+    container.appendChild(element);
+  });
+
+  $all(".delete-note").forEach(button => {
+    button.addEventListener("click", function () {
+      state.notes = state.notes.filter(
+        note => note.id !== this.dataset.id
+      );
+
+      saveState();
+      renderNotes();
+    });
+  });
+}
+
+function addNote() {
+  const input =
+    document.querySelector("#noteInput") ||
+    document.querySelector(".note-input") ||
+    document.querySelector("#newNote");
+
+  if (!input) return;
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  state.notes.unshift({
+    id: Date.now().toString(),
+    text,
+    createdAt: new Date().toISOString()
+  });
+
+  saveState();
+  renderNotes();
+
+  input.value = "";
+}
+
+function initNotes() {
+  renderNotes();
+
+  const button =
+    document.querySelector("#addNote") ||
+    document.querySelector(".add-note");
+
+  if (button) {
+    button.addEventListener("click", addNote);
+  }
+}
+
+
+/* =========================================================
+   TASKS
+========================================================= */
+
+function renderTasks() {
+  const container =
+    document.querySelector("#tasksList") ||
+    document.querySelector(".tasks-list");
+
+  if (!container) return;
+
+  if (state.tasks.length === 0) {
+    container.innerHTML =
+      `<div class="empty-state">Žiadne úlohy.</div>`;
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  state.tasks.forEach(task => {
+    const element = document.createElement("div");
+
+    element.className =
+      `task ${task.completed ? "completed" : ""}`;
+
+    element.innerHTML = `
+      <label class="task-main">
+        <input
+          type="checkbox"
+          class="task-checkbox"
+          data-id="${escapeHTML(task.id)}"
+          ${task.completed ? "checked" : ""}
+        >
+
+        <span>
+          ${escapeHTML(task.text)}
+        </span>
+      </label>
+
+      <button
+        class="delete-task"
+        data-id="${escapeHTML(task.id)}"
+        type="button"
+      >
+        ×
+      </button>
+    `;
+
+    container.appendChild(element);
+  });
+
+  $all(".task-checkbox").forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const task = state.tasks.find(
+        item => item.id === this.dataset.id
+      );
+
+      if (task) {
+        task.completed = this.checked;
+      }
+
+      saveState();
+      renderTasks();
+    });
+  });
+
+  $all(".delete-task").forEach(button => {
+    button.addEventListener("click", function () {
+      state.tasks = state.tasks.filter(
+        task => task.id !== this.dataset.id
+      );
+
+      saveState();
+      renderTasks();
+    });
+  });
+}
+
+function addTask() {
+  const input =
+    document.querySelector("#taskInput") ||
+    document.querySelector(".task-input") ||
+    document.querySelector("#newTask");
+
+  if (!input) return;
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  state.tasks.push({
+    id: Date.now().toString(),
+    text,
+    completed: false,
+    createdAt: new Date().toISOString()
+  });
+
+  saveState();
+  renderTasks();
+
+  input.value = "";
+}
+
+function initTasks() {
+  renderTasks();
+
+  const button =
+    document.querySelector("#addTask") ||
+    document.querySelector(".add-task");
+
+  if (button) {
+    button.addEventListener("click", addTask);
+  }
+}
+
+
+/* =========================================================
+   EXPORT / IMPORT
+========================================================= */
+
+function exportData() {
+  const data = JSON.stringify(state, null, 2);
+
+  const blob = new Blob(
+    [data],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "personal-dashboard-backup.json";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+function importData(file) {
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function () {
+    try {
+      const imported = JSON.parse(reader.result);
+
+      state = {
+        ...structuredClone(DEFAULT_STATE),
+        ...imported
+      };
+
+      saveState();
+
+      applyTheme();
+      applyBackground();
+      applyAccent();
+      renderLinks();
+      renderNotes();
+      renderTasks();
+
+      alert("Dáta boli úspešne importované.");
+    } catch (error) {
+      alert("Súbor obsahuje neplatné dáta.");
+      console.error(error);
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetAllData() {
+  const confirmed = confirm(
+    "Naozaj chceš vymazať všetky uložené dáta?"
+  );
+
+  if (!confirmed) return;
+
+  state = structuredClone(DEFAULT_STATE);
+
+  saveState();
+
+  applyTheme();
+  applyBackground();
+  applyAccent();
+  renderLinks();
+  renderNotes();
+  renderTasks();
+  resetTimer();
+
+  location.reload();
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function initSettings() {
+  const exportButton =
+    document.querySelector("#exportData") ||
+    document.querySelector(".export-data");
+
+  if (exportButton) {
+    exportButton.addEventListener(
+      "click",
+      exportData
+    );
+  }
+
+  const importInput =
+    document.querySelector("#importData") ||
+    document.querySelector(".import-data");
+
+  if (importInput) {
+    importInput.addEventListener("change", function () {
+      importData(this.files[0]);
+    });
+  }
+
+  const resetButton =
+    document.querySelector("#resetData") ||
+    document.querySelector(".reset-data");
+
+  if (resetButton) {
+    resetButton.addEventListener(
+      "click",
+      resetAllData
+    );
+  }
+}
+
+
+/* =========================================================
+   MODALS / PANELS
+========================================================= */
+
+function initPanels() {
+  $all("[data-open]").forEach(button => {
+    button.addEventListener("click", function () {
+      const targetId = this.dataset.open;
+      const target = document.getElementById(targetId);
+
+      if (target) {
+        target.classList.add("active");
+        target.classList.add("open");
+      }
+    });
+  });
+
+  $all("[data-close]").forEach(button => {
+    button.addEventListener("click", function () {
+      const targetId = this.dataset.close;
+      const target = document.getElementById(targetId);
+
+      if (target) {
+        target.classList.remove("active");
+        target.classList.remove("open");
+      }
+    });
+  });
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+function initMobileMenu() {
+  const menuButton =
+    document.querySelector("#mobileMenu") ||
+    document.querySelector(".mobile-menu");
+
+  const sidebar =
+    document.querySelector(".sidebar");
+
+  if (!menuButton || !sidebar) return;
+
+  menuButton.addEventListener("click", function () {
+    sidebar.classList.toggle("open");
+  });
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+function init() {
+  console.log("Personal Dashboard: inicializácia...");
+
+  startClock();
+  initSearch();
+  initTheme();
+  initBackground();
+  initAccent();
+  initSidebar();
+  initLinks();
+  initTimer();
+  initNotes();
+  initTasks();
+  initSettings();
+  initPanels();
+  initMobileMenu();
+
+  console.log("Personal Dashboard: pripravený.");
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    init
+  );
+} else {
+  init();
 }
