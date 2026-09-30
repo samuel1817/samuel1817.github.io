@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">Dashboard</h1>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="dashboard" aria-label="Dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-section="quick-links" aria-label="Quick Links">
+                    <i class="fas fa-link"></i>
+                    <span>Quick Links</span>
+                </button>
+                <button class="nav-item" data-section="notes" aria-label="Notes">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Notes</span>
+                </button>
+                <button class="nav-item" data-section="tasks" aria-label="Tasks">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                </button>
+                <button class="nav-item" data-section="settings" aria-label="Settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Toggle Button (Mobile) -->
+        <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" aria-label="Open sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h2 id="sectionTitle">Dashboard</h2>
+                </div>
+                <div class="header-right">
+                    <div class="theme-toggle">
+                        <button id="themeToggle" class="theme-btn" aria-label="Toggle dark/light mode">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Search or enter URL..."
+                    aria-label="Search"
+                >
+                <button id="searchBtn" class="search-btn" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content">
+                <!-- Dashboard Section -->
+                <section class="section active" id="dashboard-section">
+                    <div class="dashboard-grid">
+                        <!-- Clock & Date -->
+                        <div class="card clock-card">
+                            <div class="clock" id="clock">00:00:00</div>
+                            <div class="date" id="date"></div>
+                        </div>
+
+                        <!-- Quick Links -->
+                        <div class="card quick-links-preview">
+                            <h3><i class="fas fa-link"></i> Quick Links</h3>
+                            <div class="links-grid" id="linksPreview">
+                                <a href="https://github.com" target="_blank" rel="noopener">
+                                    <i class="fab fa-github"></i>
+                                    <span>GitHub</span>
+                                </a>
+                                <a href="https://gmail.com" target="_blank" rel="noopener">
+                                    <i class="fab fa-google"></i>
+                                    <span>Gmail</span>
+                                </a>
+                                <a href="https://youtube.com" target="_blank" rel="noopener">
+                                    <i class="fab fa-youtube"></i>
+                                    <span>YouTube</span>
+                                </a>
+                                <a href="https://twitter.com" target="_blank" rel="noopener">
+                                    <i class="fab fa-twitter"></i>
+                                    <span>Twitter</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Timer -->
+                        <div class="card timer-card">
+                            <h3><i class="fas fa-hourglass-end"></i> Timer</h3>
+                            <div class="timer-display" id="timerDisplay">00:00</div>
+                            <div class="timer-inputs">
+                                <input 
+                                    type="number" 
+                                    id="timerMinutes" 
+                                    class="timer-input" 
+                                    placeholder="Min" 
+                                    min="0" 
+                                    max="60"
+                                    aria-label="Minutes"
+                                >
+                                <input 
+                                    type="number" 
+                                    id="timerSeconds" 
+                                    class="timer-input" 
+                                    placeholder="Sec" 
+                                    min="0" 
+                                    max="59"
+                                    aria-label="Seconds"
+                                >
+                            </div>
+                            <div class="timer-buttons">
+                                <button id="timerStart" class="btn btn-small" aria-label="Start timer">
+                                    <i class="fas fa-play"></i> Start
+                                </button>
+                                <button id="timerPause" class="btn btn-small" aria-label="Pause timer">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button id="timerReset" class="btn btn-small" aria-label="Reset timer">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Notes Preview -->
+                        <div class="card notes-preview">
+                            <h3><i class="fas fa-sticky-note"></i> Recent Notes</h3>
+                            <div id="notesPreview" class="notes-preview-list">
+                                <p class="empty-message">No notes yet</p>
+                            </div>
+                        </div>
+
+                        <!-- Tasks Preview -->
+                        <div class="card tasks-preview">
+                            <h3><i class="fas fa-tasks"></i> Tasks</h3>
+                            <div id="tasksPreview" class="tasks-preview-list">
+                                <p class="empty-message">No tasks yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Links Section -->
+                <section class="section" id="quick-links-section">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3><i class="fas fa-link"></i> Manage Quick Links</h3>
+                            <button id="addLinkBtn" class="btn" aria-label="Add new link">
+                                <i class="fas fa-plus"></i> Add Link
+                            </button>
+                        </div>
+
+                        <form id="addLinkForm" class="hidden">
+                            <div class="form-group">
+                                <input 
+                                    type="text" 
+                                    id="linkTitle" 
+                                    placeholder="Link Title" 
+                                    required
+                                    aria-label="Link title"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <input 
+                                    type="url" 
+                                    id="linkUrl" 
+                                    placeholder="URL" 
+                                    required
+                                    aria-label="Link URL"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <input 
+                                    type="text" 
+                                    id="linkIcon" 
+                                    placeholder="Icon class (e.g., fas fa-github)" 
+                                    aria-label="Icon class"
+                                >
+                            </div>
+                            <div class="form-buttons">
+                                <button type="submit" class="btn" aria-label="Save link">Save</button>
+                                <button type="button" id="cancelLinkBtn" class="btn btn-secondary" aria-label="Cancel">Cancel</button>
+                            </div>
+                        </form>
+
+                        <div id="linksList" class="items-grid"></div>
+                    </div>
+                </section>
+
+                <!-- Notes Section -->
+                <section class="section" id="notes-section">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3><i class="fas fa-sticky-note"></i> Notes</h3>
+                            <button id="addNoteBtn" class="btn" aria-label="Add new note">
+                                <i class="fas fa-plus"></i> New Note
+                            </button>
+                        </div>
+
+                        <form id="addNoteForm" class="hidden">
+                            <div class="form-group">
+                                <input 
+                                    type="text" 
+                                    id="noteTitle" 
+                                    placeholder="Note Title" 
+                                    required
+                                    aria-label="Note title"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <textarea 
+                                    id="noteContent" 
+                                    placeholder="Note Content" 
+                                    rows="5" 
+                                    required
+                                    aria-label="Note content"
+                                ></textarea>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="submit" class="btn" aria-label="Save note">Save</button>
+                                <button type="button" id="cancelNoteBtn" class="btn btn-secondary" aria-label="Cancel">Cancel</button>
+                            </div>
+                        </form>
+
+                        <div id="notesList" class="notes-list"></div>
+                    </div>
+                </section>
+
+                <!-- Tasks Section -->
+                <section class="section" id="tasks-section">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3><i class="fas fa-tasks"></i> Tasks</h3>
+                            <button id="addTaskBtn" class="btn" aria-label="Add new task">
+                                <i class="fas fa-plus"></i> New Task
+                            </button>
+                        </div>
+
+                        <form id="addTaskForm" class="hidden">
+                            <div class="form-group">
+                                <input 
+                                    type="text" 
+                                    id="taskTitle" 
+                                    placeholder="Task Title" 
+                                    required
+                                    aria-label="Task title"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <textarea 
+                                    id="taskDescription" 
+                                    placeholder="Task Description" 
+                                    rows="3"
+                                    aria-label="Task description"
+                                ></textarea>
+                            </div>
+                            <div class="form-group">
+                                <select id="taskPriority" aria-label="Task priority">
+                                    <option value="low">Low Priority</option>
+                                    <option value="medium" selected>Medium Priority</option>
+                                    <option value="high">High Priority</option>
+                                </select>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="submit" class="btn" aria-label="Save task">Save</button>
+                                <button type="button" id="cancelTaskBtn" class="btn btn-secondary" aria-label="Cancel">Cancel</button>
+                            </div>
+                        </form>
+
+                        <div id="tasksList" class="tasks-list"></div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section class="section" id="settings-section">
+                    <div class="section-card">
+                        <h3><i class="fas fa-cog"></i> Settings</h3>
+
+                        <div class="settings-group">
+                            <h4>Appearance</h4>
+                            <div class="setting-item">
+                                <label for="backgroundSelect">Background:</label>
+                                <select id="backgroundSelect" aria-label="Background style">
+                                    <option value="gradient-1">Gradient 1</option>
+                                    <option value="gradient-2">Gradient 2</option>
+                                    <option value="gradient-3">Gradient 3</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="light">Light</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label for="colorSelect">Accent Color:</label>
+                                <input 
+                                    type="color" 
+                                    id="colorSelect" 
+                                    value="#3498db"
+                                    aria-label="Accent color"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4>Data</h4>
+                            <div class="setting-item">
+                                <button id="exportBtn" class="btn btn-secondary" aria-label="Export data">
+                                    <i class="fas fa-download"></i> Export Data
+                                </button>
+                                <button id="importBtn" class="btn btn-secondary" aria-label="Import data">
+                                    <i class="fas fa-upload"></i> Import Data
+                                </button>
+                                <input type="file" id="importFile" class="hidden" accept=".json">
+                            </div>
+                            <div class="setting-item">
+                                <button id="resetBtn" class="btn btn-danger" aria-label="Reset all data">
+                                    <i class="fas fa-exclamation-triangle"></i> Reset All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
