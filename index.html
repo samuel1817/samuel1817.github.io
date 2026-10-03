@@ -1,163 +1,182 @@
 <!DOCTYPE html>
+
 <html lang="sk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INFINITY SHOOTER</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Three.js import map -->
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+    }
+  }
+  </script>
+
 </head>
 
 <body>
 
-  <!-- MAIN MENU -->
   <div id="menu" class="menu">
     <div class="menu-card">
-      <div class="eyebrow">INFINITY STUDIOS</div>
 
-      <h1>
-        INFINITY<br>
-        <span>SHOOTER</span>
-      </h1>
-
-      <p>3D webová FPS hra</p>
-
-      <button id="startBtn">START GAME</button>
-
-      <div class="controls">
-        <span><b>WASD</b> Pohyb</span>
-        <span><b>MYŠ</b> Rozhliadanie</span>
-        <span><b>LMB</b> Streľba</span>
-        <span><b>R</b> Reload</span>
-        <span><b>ESC</b> Pauza</span>
-      </div>
-    </div>
+```
+  <div class="eyebrow">
+    INFINITY STUDIOS
   </div>
 
+  <h1>
+    INFINITY<br>
+    <span>SHOOTER</span>
+  </h1>
 
-  <!-- HUD -->
+  <p>
+    3D webová FPS hra
+  </p>
+
+  <button id="startBtn">
+    START GAME
+  </button>
+
+  <div class="controls">
+    <span><b>WASD</b> Pohyb</span>
+    <span><b>MYŠ</b> Rozhliadanie</span>
+    <span><b>LMB</b> Streľba</span>
+    <span><b>R</b> Reload</span>
+    <span><b>ESC</b> Pauza</span>
+  </div>
+
+</div>
+```
+
+  </div>
+
   <div id="hud" class="hud hidden">
 
-    <div class="topbar">
+```
+<div class="topbar">
 
-      <div class="brand">
-        INFINITY <span>SHOOTER</span>
-      </div>
+  <div class="brand">
+    INFINITY <span>SHOOTER</span>
+  </div>
 
-      <div class="stats">
+  <div class="stats">
 
-        <div>
-          <small>SCORE</small>
-          <strong id="score">0</strong>
-        </div>
-
-        <div>
-          <small>ENEMIES</small>
-          <strong id="enemies">0</strong>
-        </div>
-
-      </div>
-
+    <div>
+      <small>SCORE</small>
+      <strong id="score">0</strong>
     </div>
 
-
-    <!-- CROSSHAIR -->
-    <div class="crosshair">
-      <i></i>
-      <i></i>
-      <i></i>
-      <i></i>
-      <b></b>
+    <div>
+      <small>ENEMIES</small>
+      <strong id="enemies">0</strong>
     </div>
-
-
-    <!-- WEAPON -->
-    <div class="weapon">
-
-      <div class="ammo">
-        <strong id="ammo">12</strong>
-        <span>/ 60</span>
-      </div>
-
-      <div class="weapon-name">
-        SIDEARM
-      </div>
-
-      <div class="bar">
-        <span id="ammoBar"></span>
-      </div>
-
-    </div>
-
-
-    <!-- HEALTH -->
-    <div class="health">
-
-      <span>HP</span>
-
-      <div class="healthbar">
-        <span id="healthBar"></span>
-      </div>
-
-      <strong id="health">100</strong>
-
-    </div>
-
-
-    <div id="message" class="message"></div>
 
   </div>
 
+</div>
 
-  <!-- PAUSE -->
+
+<div class="crosshair">
+  <i></i>
+  <i></i>
+  <i></i>
+  <i></i>
+  <b></b>
+</div>
+
+
+<div class="weapon">
+
+  <div class="ammo">
+    <strong id="ammo">12</strong>
+    <span>/ 60</span>
+  </div>
+
+  <div class="weapon-name">
+    SIDEARM
+  </div>
+
+  <div class="bar">
+    <span id="ammoBar"></span>
+  </div>
+
+</div>
+
+
+<div class="health">
+
+  <span>HP</span>
+
+  <div class="healthbar">
+    <span id="healthBar"></span>
+  </div>
+
+  <strong id="health">100</strong>
+
+</div>
+
+
+<div id="message" class="message"></div>
+```
+
+  </div>
+
   <div id="pause" class="overlay hidden">
 
-    <div class="pause-card">
+```
+<div class="pause-card">
 
-      <h2>PAUSED</h2>
+  <h2>PAUSED</h2>
 
-      <p>
-        Pokračuj kliknutím do hry.
-      </p>
+  <p>
+    Pokračuj kliknutím do hry.
+  </p>
 
-      <button id="resumeBtn">
-        RESUME
-      </button>
+  <button id="resumeBtn">
+    RESUME
+  </button>
 
-      <button id="menuBtn" class="secondary">
-        MAIN MENU
-      </button>
+  <button id="menuBtn" class="secondary">
+    MAIN MENU
+  </button>
 
-    </div>
+</div>
+```
 
   </div>
 
-
-  <!-- GAME OVER -->
   <div id="gameover" class="overlay hidden">
 
-    <div class="pause-card">
+```
+<div class="pause-card">
 
-      <h2 id="gameoverTitle">
-        GAME OVER
-      </h2>
+  <h2>
+    GAME OVER
+  </h2>
 
-      <p>
-        Score:
-        <b id="finalScore">0</b>
-      </p>
+  <p>
+    Score:
+    <b id="finalScore">0</b>
+  </p>
 
-      <button id="restartBtn">
-        PLAY AGAIN
-      </button>
+  <button id="restartBtn">
+    PLAY AGAIN
+  </button>
 
-      <button id="gameoverMenuBtn" class="secondary">
-        MAIN MENU
-      </button>
+  <button id="gameoverMenuBtn" class="secondary">
+    MAIN MENU
+  </button>
 
-    </div>
+</div>
+```
 
   </div>
-
 
   <script type="module" src="game.js"></script>
 
