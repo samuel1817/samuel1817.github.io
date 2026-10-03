@@ -1,97 +1,64 @@
-```html
 <!DOCTYPE html>
+
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INFINITY SHOOTER</title>
+    <title>PC Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <!-- MAIN MENU -->
-    <div id="menu">
-        <div class="menu-box">
-            <h1>INFINITY</h1>
-            <h2>SHOOTER</h2>
-            <p>3D FPS • SURVIVAL</p>
-
-            <button id="startBtn">START GAME</button>
-
-            <div class="controls">
-                <span>W A S D</span> Move
-                <span>Mouse</span> Aim
-                <span>Left Click</span> Shoot
-                <span>R</span> Reload
-                <span>ESC</span> Pause
-            </div>
+```
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-icon">🖥️</div>
+        <div>
+            <strong>PC Dashboard</strong>
+            <span>My personal tools</span>
         </div>
     </div>
 
-    <!-- HUD -->
-    <div id="hud">
-        <div class="top-left">
-            <div class="health">
-                <span>HP</span>
-                <div class="health-bar">
-                    <div id="healthFill"></div>
-                </div>
-                <b id="healthText">100</b>
-            </div>
-        </div>
+    <nav>
+        <button class="nav-item active" data-page="dashboard">
+            <span>⌂</span>
+            Dashboard
+        </button>
 
-        <div class="top-right">
-            <div class="score">SCORE <b id="score">0</b></div>
-            <div class="enemies">ENEMIES <b id="enemyCount">0</b></div>
-        </div>
+        <button class="nav-item" data-page="pc">
+            <span>🖥️</span>
+            My PC
+        </button>
 
-        <div class="crosshair">
-            <span></span>
-        </div>
+        <button class="nav-item" data-page="gaming">
+            <span>🎮</span>
+            Gaming
+        </button>
 
-        <div class="weapon">
-            <div class="weapon-name">INFINITY RIFLE</div>
-            <div class="ammo">
-                <b id="ammo">30</b>
-                <span>/ 120</span>
-            </div>
-        </div>
+        <button class="nav-item" data-page="shortcuts">
+            <span>⌨️</span>
+            Shortcuts
+        </button>
 
-        <div id="reloadText">RELOADING...</div>
+        <button class="nav-item" data-page="calculators">
+            <span>🧮</span>
+            Calculators
+        </button>
+
+        <button class="nav-item" data-page="tools">
+            <span>🛠️</span>
+            Tools
+        </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <button class="nav-item" id="themeButton">
+            <span>☾</span>
+            Toggle theme
+        </button>
     </div>
+</aside>
 
-    <!-- PAUSE -->
-    <div id="pauseScreen">
-        <div class="overlay-box">
-            <h1>PAUSED</h1>
-            <button id="resumeBtn">RESUME</button>
-            <button id="menuBtn">MAIN MENU</button>
-        </div>
-    </div>
-
-    <!-- GAME OVER -->
-    <div id="gameOver">
-        <div class="overlay-box">
-            <h1>GAME OVER</h1>
-            <p>YOUR SCORE</p>
-            <strong id="finalScore">0</strong>
-
-            <button id="restartBtn">PLAY AGAIN</button>
-            <button id="gameMenuBtn">MAIN MENU</button>
-        </div>
-    </div>
-
-    <!-- THREE.JS -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
-        }
-    }
-    </script>
-
-    <script type="module" src="game.js"></script>
-
-</body>
-</html>
+<main clas
 ```
