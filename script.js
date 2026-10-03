@@ -1,343 +1,651 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-/* =========================
-   BASIC SETUP
-========================= */
+
+/* =========================================
+   SCENE
+========================================= */
 
 const scene = new THREE.Scene();
 
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb, 35, 120);
+scene.background =
+    new THREE.Color(0x9aa4ad);
 
-const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    300
+scene.fog =
+    new THREE.Fog(
+        0x9aa4ad,
+        35,
+        140
+    );
+
+
+/* =========================================
+   CAMERA
+========================================= */
+
+const camera =
+    new THREE.PerspectiveCamera(
+        78,
+        window.innerWidth /
+        window.innerHeight,
+        0.1,
+        300
+    );
+
+
+/* =========================================
+   RENDERER
+========================================= */
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias: true
+    });
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
 );
 
-const renderer = new THREE.WebGLRenderer({
-    antialias: true
-});
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
+);
 
 renderer.shadowMap.enabled = true;
 
-document.body.appendChild(renderer.domElement);
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+document.body.appendChild(
+    renderer.domElement
+);
 
 
-/* =========================
+/* =========================================
    LIGHTING
-========================= */
+========================================= */
 
-const ambientLight = new THREE.HemisphereLight(
-    0xffffff,
-    0x444444,
-    2
+const hemi =
+    new THREE.HemisphereLight(
+        0xeaf4ff,
+        0x20242a,
+        2.2
+    );
+
+scene.add(hemi);
+
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffffff,
+        3.5
+    );
+
+sun.position.set(
+    -30,
+    60,
+    25
 );
 
-scene.add(ambientLight);
-
-const sun = new THREE.DirectionalLight(
-    0xffffff,
-    3
-);
-
-sun.position.set(20, 40, 20);
 sun.castShadow = true;
 
-sun.shadow.mapSize.width = 2048;
-sun.shadow.mapSize.height = 2048;
+sun.shadow.mapSize.width =
+    2048;
+
+sun.shadow.mapSize.height =
+    2048;
+
+sun.shadow.camera.left = -80;
+sun.shadow.camera.right = 80;
+sun.shadow.camera.top = 80;
+sun.shadow.camera.bottom = -80;
 
 scene.add(sun);
 
 
-/* =========================
+/* =========================================
    WORLD
-========================= */
+========================================= */
 
-const blocks = [];
+const platforms = [];
 
-function createBlock(x, y, z, width, height, depth, color = 0x4caf50) {
 
-    const geometry = new THREE.BoxGeometry(
-        width,
-        height,
-        depth
+function createPlatform(
+    x,
+    y,
+    z,
+    width,
+    height,
+    depth,
+    color = 0x20262d
+) {
+
+    const geometry =
+        new THREE.BoxGeometry(
+            width,
+            height,
+            depth
+        );
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color,
+            roughness: 0.7,
+            metalness: 0.25
+        });
+
+    const mesh =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    mesh.position.set(
+        x,
+        y,
+        z
     );
 
-    const material = new THREE.MeshStandardMaterial({
-        color
-    });
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 
-    const block = new THREE.Mesh(
-        geometry,
-        material
-    );
+    scene.add(mesh);
 
-    block.position.set(x, y, z);
+    platforms.push({
+        mesh,
 
-    block.castShadow = true;
-    block.receiveShadow = true;
-
-    scene.add(block);
-
-    blocks.push({
-        mesh: block,
         x,
         y,
         z,
+
         width,
         height,
         depth
     });
 
-    return block;
+    return mesh;
 }
 
 
-/* =========================
-   PARKOUR MAP
-========================= */
+/* =========================================
+   PARKOUR COURSE
+========================================= */
 
-// Starting platform
-createBlock(0, -1, 0, 12, 2, 12, 0x3f8f4f);
+/* START */
 
-// Platforms
-createBlock(0, 0, -10, 5, 2, 5, 0x4caf50);
-createBlock(7, 2, -17, 5, 2, 5, 0x3498db);
-createBlock(-1, 4, -25, 5, 2, 5, 0xe67e22);
-createBlock(-9, 6, -32, 5, 2, 5, 0x9b59b6);
-createBlock(0, 8, -40, 6, 2, 6, 0x2ecc71);
+createPlatform(
+    0,
+    -1,
+    0,
+    14,
+    2,
+    14,
+    0x293139
+);
 
-// Final platform
-createBlock(10, 10, -49, 8, 2, 8, 0xf1c40f);
 
+/* JUMPS */
 
-/* =========================
-   FINISH
-========================= */
+createPlatform(
+    0,
+    0,
+    -11,
+    6,
+    2,
+    6,
+    0x343c44
+);
 
-const finishGeometry = new THREE.BoxGeometry(
-    4,
+createPlatform(
+    7,
+    1.5,
+    -19,
     5,
-    0.5
+    2,
+    5,
+    0x343c44
 );
 
-const finishMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    emissive: 0x222222
-});
-
-const finish = new THREE.Mesh(
-    finishGeometry,
-    finishMaterial
+createPlatform(
+    -1,
+    3,
+    -27,
+    5,
+    2,
+    5,
+    0x343c44
 );
 
-finish.position.set(10, 13, -49);
+createPlatform(
+    -9,
+    5,
+    -35,
+    5,
+    2,
+    5,
+    0x343c44
+);
+
+createPlatform(
+    0,
+    7,
+    -43,
+    6,
+    2,
+    6,
+    0x343c44
+);
+
+createPlatform(
+    9,
+    9,
+    -51,
+    6,
+    2,
+    6,
+    0x343c44
+);
+
+
+/* =========================================
+   ACCENT STRIPS
+========================================= */
+
+function createAccent(
+    x,
+    y,
+    z,
+    w,
+    d
+) {
+
+    const geometry =
+        new THREE.BoxGeometry(
+            w,
+            0.08,
+            d
+        );
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color: 0x8cff00,
+            emissive: 0x315f00,
+            emissiveIntensity: 1.5
+        });
+
+    const mesh =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    mesh.position.set(
+        x,
+        y,
+        z
+    );
+
+    scene.add(mesh);
+}
+
+
+/* Platform details */
+
+createAccent(0, 0.04, -11, 4, 0.12);
+createAccent(7, 1.54, -19, 3, 0.12);
+createAccent(-1, 3.04, -27, 3, 0.12);
+createAccent(-9, 5.04, -35, 3, 0.12);
+createAccent(0, 7.04, -43, 4, 0.12);
+createAccent(9, 9.04, -51, 4, 0.12);
+
+
+/* =========================================
+   CHECKPOINTS
+========================================= */
+
+const checkpoints = [
+
+    {
+        position:
+            new THREE.Vector3(
+                0,
+                2,
+                -11
+            ),
+        name: "01"
+    },
+
+    {
+        position:
+            new THREE.Vector3(
+                7,
+                3.5,
+                -19
+            ),
+        name: "02"
+    },
+
+    {
+        position:
+            new THREE.Vector3(
+                -1,
+                5,
+                -27
+            ),
+        name: "03"
+    },
+
+    {
+        position:
+            new THREE.Vector3(
+                -9,
+                7,
+                -35
+            ),
+        name: "04"
+    },
+
+    {
+        position:
+            new THREE.Vector3(
+                0,
+                9,
+                -43
+            ),
+        name: "05"
+    }
+];
+
+
+let checkpointIndex = -1;
+
+
+/* =========================================
+   FINISH
+========================================= */
+
+const finishGeometry =
+    new THREE.BoxGeometry(
+        5,
+        5,
+        0.4
+    );
+
+const finishMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x8cff00,
+        emissive: 0x4d8f00,
+        emissiveIntensity: 2
+    });
+
+const finish =
+    new THREE.Mesh(
+        finishGeometry,
+        finishMaterial
+    );
+
+finish.position.set(
+    9,
+    12,
+    -51
+);
 
 scene.add(finish);
 
 
-/* =========================
+/* =========================================
    PLAYER
-========================= */
+========================================= */
 
 const player = {
-    position: new THREE.Vector3(0, 2, 3),
 
-    velocity: new THREE.Vector3(),
+    position:
+        new THREE.Vector3(
+            0,
+            2,
+            3
+        ),
 
-    height: 1.7,
+    velocity:
+        new THREE.Vector3(),
 
-    speed: 7,
-    jump: 8,
+    height: 1.75,
 
-    onGround: false
+    walkSpeed: 7,
+
+    sprintSpeed: 12,
+
+    jumpPower: 9,
+
+    gravity: 25,
+
+    grounded: false
 };
 
-camera.position.copy(player.position);
 
-
-/* =========================
+/* =========================================
    INPUT
-========================= */
+========================================= */
 
 const keys = {};
 
-document.addEventListener("keydown", (event) => {
+window.addEventListener(
+    "keydown",
+    event => {
 
-    keys[event.code] = true;
+        keys[event.code] = true;
 
-    if (
-        event.code === "Space" &&
-        player.onGround
-    ) {
+        if (
+            event.code === "Space" &&
+            player.grounded &&
+            gameRunning
+        ) {
 
-        player.velocity.y = player.jump;
-        player.onGround = false;
+            player.velocity.y =
+                player.jumpPower;
+
+            player.grounded = false;
+        }
+
     }
-
-});
-
-document.addEventListener("keyup", (event) => {
-    keys[event.code] = false;
-});
+);
 
 
-/* =========================
-   MOUSE LOOK
-========================= */
+window.addEventListener(
+    "keyup",
+    event => {
+
+        keys[event.code] = false;
+
+    }
+);
+
+
+/* =========================================
+   CAMERA LOOK
+========================================= */
 
 let yaw = 0;
 let pitch = 0;
 
-let gameStarted = false;
 
-document.addEventListener("mousemove", (event) => {
+document.addEventListener(
+    "mousemove",
+    event => {
 
-    if (!gameStarted) return;
+        if (
+            !gameRunning ||
+            document.pointerLockElement !==
+            renderer.domElement
+        ) {
+            return;
+        }
 
-    if (document.pointerLockElement !== renderer.domElement) {
-        return;
+        yaw -=
+            event.movementX * 0.0022;
+
+        pitch -=
+            event.movementY * 0.0022;
+
+        pitch =
+            Math.max(
+                -1.45,
+                Math.min(
+                    1.45,
+                    pitch
+                )
+            );
+
     }
-
-    yaw -= event.movementX * 0.002;
-    pitch -= event.movementY * 0.002;
-
-    pitch = Math.max(
-        -Math.PI / 2 + 0.1,
-        Math.min(Math.PI / 2 - 0.1, pitch)
-    );
-
-});
+);
 
 
-/* =========================
-   COLLISION
-========================= */
+/* =========================================
+   GROUND COLLISION
+========================================= */
 
-function checkGround() {
+function updateGround() {
 
-    player.onGround = false;
+    player.grounded = false;
 
-    const playerX = player.position.x;
-    const playerZ = player.position.z;
+    const feet =
+        player.position.y -
+        player.height;
 
-    const feet = player.position.y - player.height;
 
-    for (const block of blocks) {
+    for (
+        const platform of platforms
+    ) {
 
-        const halfX = block.width / 2;
-        const halfZ = block.depth / 2;
+        const halfX =
+            platform.width / 2;
+
+        const halfZ =
+            platform.depth / 2;
 
         const insideX =
-            playerX > block.x - halfX &&
-            playerX < block.x + halfX;
+            player.position.x >
+                platform.x - halfX &&
+            player.position.x <
+                platform.x + halfX;
 
         const insideZ =
-            playerZ > block.z - halfZ &&
-            playerZ < block.z + halfZ;
+            player.position.z >
+                platform.z - halfZ &&
+            player.position.z <
+                platform.z + halfZ;
 
-        const top = block.y + block.height / 2;
+        const top =
+            platform.y +
+            platform.height / 2;
+
 
         if (
             insideX &&
             insideZ &&
-            feet <= top + 0.2 &&
-            feet >= top - 1
+            feet <= top + 0.15 &&
+            feet >= top - 1.5 &&
+            player.velocity.y <= 0
         ) {
 
             player.position.y =
-                top + player.height;
+                top +
+                player.height;
 
             player.velocity.y = 0;
 
-            player.onGround = true;
+            player.grounded = true;
 
-            break;
         }
+
     }
+
 }
 
 
-/* =========================
-   RESET
-========================= */
+/* =========================================
+   CHECKPOINT SYSTEM
+========================================= */
 
-function resetPlayer() {
+function updateCheckpoints() {
 
-    player.position.set(
+    for (
+        let i = 0;
+        i < checkpoints.length;
+        i++
+    ) {
+
+        if (
+            i <= checkpointIndex
+        ) continue;
+
+
+        const distance =
+            player.position.distanceTo(
+                checkpoints[i].position
+            );
+
+
+        if (distance < 4) {
+
+            checkpointIndex = i;
+
+            document
+                .getElementById(
+                    "checkpointNumber"
+                )
+                .textContent =
+                checkpoints[i].name;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+   RESET TO CHECKPOINT
+========================================= */
+
+function resetToCheckpoint() {
+
+    if (checkpointIndex < 0) {
+
+        player.position.set(
+            0,
+            2,
+            3
+        );
+
+    } else {
+
+        const checkpoint =
+            checkpoints[
+                checkpointIndex
+            ];
+
+        player.position.copy(
+            checkpoint.position
+        );
+
+    }
+
+    player.velocity.set(
         0,
-        2,
-        3
+        0,
+        0
     );
 
-    player.velocity.set(0, 0, 0);
-
-    yaw = 0;
-    pitch = 0;
 }
 
 
-/* =========================
-   GAME STATE
-========================= */
-
-let startTime = 0;
-let finished = false;
-
-const menu = document.getElementById("menu");
-const hud = document.getElementById("hud");
-const winScreen = document.getElementById("winScreen");
-
-const timerElement =
-    document.getElementById("timer");
-
-const finalTime =
-    document.getElementById("finalTime");
-
-const startButton =
-    document.getElementById("startButton");
-
-const restartButton =
-    document.getElementById("restartButton");
-
-
-function startGame() {
-
-    gameStarted = true;
-    finished = false;
-
-    menu.style.display = "none";
-    winScreen.style.display = "none";
-    hud.style.display = "block";
-
-    resetPlayer();
-
-    startTime = performance.now();
-
-    renderer.domElement.requestPointerLock();
-}
-
-
-startButton.addEventListener(
-    "click",
-    startGame
-);
-
-
-restartButton.addEventListener(
-    "click",
-    startGame
-);
-
-
-/* =========================
+/* =========================================
    FINISH CHECK
-========================= */
+========================================= */
 
 function checkFinish() {
 
@@ -346,145 +654,431 @@ function checkFinish() {
             finish.position
         );
 
+
     if (
         distance < 5 &&
-        !finished
+        !levelComplete
     ) {
 
-        finished = true;
-        gameStarted = false;
+        finishLevel();
 
-        const time =
-            (performance.now() - startTime) / 1000;
-
-        finalTime.textContent =
-            time.toFixed(2) + " s";
-
-        winScreen.style.display = "flex";
-        hud.style.display = "none";
-
-        document.exitPointerLock();
     }
+
 }
 
 
-/* =========================
-   FALL RESET
-========================= */
+/* =========================================
+   TIMER
+========================================= */
 
-function checkFall() {
+let startTime = 0;
 
-    if (player.position.y < -15) {
 
-        resetPlayer();
+function formatTime(seconds) {
 
-    }
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
+
+    const secs =
+        seconds % 60;
+
+    return (
+        String(minutes)
+            .padStart(2, "0")
+        +
+        ":" +
+        secs.toFixed(2)
+            .padStart(5, "0")
+    );
+
 }
 
 
-/* =========================
+/* =========================================
+   GAME STATE
+========================================= */
+
+let gameRunning = false;
+let levelComplete = false;
+
+
+function startGame() {
+
+    gameRunning = true;
+    levelComplete = false;
+
+    checkpointIndex = -1;
+
+    document
+        .getElementById(
+            "checkpointNumber"
+        )
+        .textContent = "START";
+
+    document
+        .getElementById(
+            "menu"
+        )
+        .style.display = "none";
+
+    document
+        .getElementById(
+            "complete"
+        )
+        .style.display = "none";
+
+    document
+        .getElementById(
+            "hud"
+        )
+        .style.display = "block";
+
+
+    player.position.set(
+        0,
+        2,
+        3
+    );
+
+    player.velocity.set(
+        0,
+        0,
+        0
+    );
+
+
+    yaw = 0;
+    pitch = 0;
+
+    startTime =
+        performance.now();
+
+
+    renderer.domElement.requestPointerLock();
+
+}
+
+
+function finishLevel() {
+
+    gameRunning = false;
+    levelComplete = true;
+
+    const time =
+        (
+            performance.now() -
+            startTime
+        ) / 1000;
+
+
+    const formatted =
+        formatTime(time);
+
+
+    let best =
+        Number(
+            localStorage.getItem(
+                "parkour_best"
+            )
+        );
+
+
+    if (
+        !best ||
+        time < best
+    ) {
+
+        best = time;
+
+        localStorage.setItem(
+            "parkour_best",
+            String(best)
+        );
+
+    }
+
+
+    document
+        .getElementById(
+            "finalTime"
+        )
+        .textContent =
+        formatted;
+
+
+    document
+        .getElementById(
+            "completeBest"
+        )
+        .textContent =
+        formatTime(best);
+
+
+    document
+        .getElementById(
+            "bestTime"
+        )
+        .textContent =
+        formatTime(best);
+
+
+    document
+        .getElementById(
+            "hud"
+        )
+        .style.display = "none";
+
+
+    document
+        .getElementById(
+            "complete"
+        )
+        .style.display = "flex";
+
+
+    document.exitPointerLock();
+
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+document
+    .getElementById(
+        "playButton"
+    )
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+document
+    .getElementById(
+        "againButton"
+    )
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+document
+    .getElementById(
+        "menuButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            gameRunning = false;
+
+            document
+                .getElementById(
+                    "complete"
+                )
+                .style.display = "none";
+
+            document
+                .getElementById(
+                    "hud"
+                )
+                .style.display = "none";
+
+            document
+                .getElementById(
+                    "menu"
+                )
+                .style.display = "flex";
+
+        }
+    );
+
+
+/* =========================================
    GAME LOOP
-========================= */
+========================================= */
 
-const clock = new THREE.Clock();
+const clock =
+    new THREE.Clock();
+
 
 function animate() {
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(
+        animate
+    );
+
 
     const delta =
-        Math.min(clock.getDelta(), 0.05);
+        Math.min(
+            clock.getDelta(),
+            0.05
+        );
 
-    if (gameStarted && !finished) {
 
-        /* Movement */
+    if (
+        gameRunning &&
+        !levelComplete
+    ) {
+
+
+        /* MOVEMENT */
 
         const direction =
             new THREE.Vector3();
 
-        if (keys["KeyW"]) {
+
+        if (
+            keys["KeyW"]
+        ) {
             direction.z -= 1;
         }
 
-        if (keys["KeyS"]) {
+        if (
+            keys["KeyS"]
+        ) {
             direction.z += 1;
         }
 
-        if (keys["KeyA"]) {
+        if (
+            keys["KeyA"]
+        ) {
             direction.x -= 1;
         }
 
-        if (keys["KeyD"]) {
+        if (
+            keys["KeyD"]
+        ) {
             direction.x += 1;
         }
 
-        if (direction.length() > 0) {
+
+        if (
+            direction.lengthSq() > 0
+        ) {
 
             direction.normalize();
 
             direction.applyAxisAngle(
-                new THREE.Vector3(0, 1, 0),
+                new THREE.Vector3(
+                    0,
+                    1,
+                    0
+                ),
                 yaw
             );
 
+
+            const sprinting =
+                keys["ShiftLeft"] ||
+                keys["ShiftRight"];
+
+
+            const speed =
+                sprinting
+                    ? player.sprintSpeed
+                    : player.walkSpeed;
+
+
             player.position.x +=
                 direction.x *
-                player.speed *
+                speed *
                 delta;
+
 
             player.position.z +=
                 direction.z *
-                player.speed *
+                speed *
                 delta;
+
         }
 
 
-        /* Gravity */
+        /* GRAVITY */
 
         player.velocity.y -=
-            20 * delta;
+            player.gravity *
+            delta;
+
 
         player.position.y +=
             player.velocity.y *
             delta;
 
 
-        checkGround();
-        checkFall();
+        updateGround();
+
+
+        /* FALL */
+
+        if (
+            player.position.y < -20
+        ) {
+
+            resetToCheckpoint();
+
+        }
+
+
+        updateCheckpoints();
+
         checkFinish();
 
 
-        /* Camera */
+        /* CAMERA */
 
         camera.position.copy(
             player.position
         );
 
-        camera.rotation.order = "YXZ";
+        camera.rotation.order =
+            "YXZ";
 
-        camera.rotation.y = yaw;
-        camera.rotation.x = pitch;
+        camera.rotation.y =
+            yaw;
+
+        camera.rotation.x =
+            pitch;
 
 
-        /* Timer */
+        /* TIMER */
 
         const elapsed =
-            (performance.now() - startTime) / 1000;
+            (
+                performance.now() -
+                startTime
+            ) / 1000;
 
-        timerElement.textContent =
-            elapsed.toFixed(2);
+
+        document
+            .getElementById(
+                "timer"
+            )
+            .textContent =
+            formatTime(elapsed);
+
     }
+
 
     renderer.render(
         scene,
         camera
     );
+
 }
 
 
-/* =========================
+animate();
+
+
+/* =========================================
    RESIZE
-========================= */
+========================================= */
 
 window.addEventListener(
     "resize",
@@ -496,6 +1090,7 @@ window.addEventListener(
 
         camera.updateProjectionMatrix();
 
+
         renderer.setSize(
             window.innerWidth,
             window.innerHeight
@@ -503,6 +1098,3 @@ window.addEventListener(
 
     }
 );
-
-
-animate();
