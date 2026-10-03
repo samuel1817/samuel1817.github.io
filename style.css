@@ -1,201 +1,192 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --white: #f5f7fa;
-    --muted: #89929d;
-    --dark: #080b0f;
-    --panel: rgba(10, 14, 19, 0.82);
-    --line: rgba(255,255,255,0.12);
-    --accent: #8cff00;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  background: #07100d;
+  color: #ffffff;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 body {
-    background: #080b0f;
-    color: var(--white);
-    font-family:
-        Inter,
-        Arial,
-        Helvetica,
-        sans-serif;
+  user-select: none;
+}
+
+canvas {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
 }
 
 
 /* =========================
-   MENU
+   MAIN MENU
 ========================= */
 
-#menu {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
+.menu,
+.overlay {
+  position: fixed;
+  inset: 0;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  z-index: 20;
 
-    background:
-        radial-gradient(
-            circle at 50% 35%,
-            rgba(140,255,0,0.08),
-            transparent 35%
-        ),
-        linear-gradient(
-            145deg,
-            #07090c,
-            #10151b
-        );
+  display: grid;
+  place-items: center;
+
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(36, 73, 52, 0.42),
+      rgba(2, 8, 6, 0.94) 70%
+    );
 }
 
-.logo {
-    font-size: clamp(55px, 9vw, 110px);
-    font-weight: 900;
-    letter-spacing: -6px;
-    line-height: 0.8;
+.menu-card,
+.pause-card {
+  width: min(520px, 90vw);
+
+  padding: 46px 42px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.12);
+
+  background:
+    rgba(7, 14, 11, 0.82);
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 25px 80px
+    rgba(0, 0, 0, 0.45);
+
+  text-align: center;
 }
 
-.logo span {
-    color: white;
+.eyebrow {
+  font-size: 11px;
+
+  letter-spacing: 5px;
+
+  opacity: 0.55;
+
+  margin-bottom: 16px;
 }
 
-.logo strong {
-    color: var(--accent);
+h1 {
+  font-size:
+    clamp(48px, 9vw, 88px);
+
+  line-height: 0.82;
+
+  margin: 0;
+
+  font-weight: 900;
+
+  letter-spacing: -4px;
 }
 
-.subtitle {
-    margin-top: 25px;
-
-    color: var(--muted);
-
-    font-size: 12px;
-    letter-spacing: 8px;
-    font-weight: 700;
-}
-
-
-/* MENU CARD */
-
-.menu-card {
-    width: min(720px, calc(100% - 40px));
-
-    margin-top: 60px;
-
-    display: flex;
-    align-items: center;
-    gap: 25px;
-
-    padding: 22px;
-
-    background: var(--panel);
-
-    border: 1px solid var(--line);
-    border-radius: 14px;
-
-    backdrop-filter: blur(20px);
-}
-
-.level-number {
-    width: 70px;
-    height: 70px;
-
-    display: grid;
-    place-items: center;
-
-    border: 1px solid rgba(140,255,0,0.35);
-    border-radius: 10px;
-
-    color: var(--accent);
-
-    font-size: 25px;
-    font-weight: 800;
-}
-
-.menu-card h2 {
-    font-size: 18px;
-    letter-spacing: 2px;
+h1 span {
+  opacity: 0.42;
 }
 
 .menu-card p {
-    margin-top: 7px;
+  opacity: 0.65;
 
-    color: var(--muted);
-
-    font-size: 13px;
-}
-
-.menu-card button {
-    margin-left: auto;
+  margin:
+    22px 0 30px;
 }
 
 
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
 
 button {
-    border: none;
+  border: 0;
 
-    padding: 14px 23px;
+  padding:
+    15px 26px;
 
-    border-radius: 8px;
+  background: #dcebdc;
 
-    background: var(--accent);
-    color: #0a0d0b;
+  color: #08100b;
 
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 1px;
+  font-weight: 800;
 
-    cursor: pointer;
+  letter-spacing: 1.5px;
 
-    transition:
-        transform 0.2s,
-        filter 0.2s;
+  cursor: pointer;
+
+  min-height: 48px;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 button:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
+  background: #ffffff;
+
+  transform: translateY(-1px);
 }
 
 button:active {
-    transform: translateY(0);
+  transform: translateY(0);
+}
+
+button.secondary {
+  margin-top: 10px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18);
 }
 
 
-/* CONTROLS */
+/* =========================
+   CONTROLS
+========================= */
 
-.instructions {
-    display: flex;
-    gap: 35px;
+.controls {
+  display: grid;
 
-    margin-top: 35px;
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 9px;
+
+  margin-top: 28px;
+
+  color:
+    rgba(255, 255, 255, 0.55);
+
+  font-size: 12px;
 }
 
-.instructions div {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
+.controls b {
+  color: #ffffff;
 
-.instructions b {
-    font-size: 11px;
-    letter-spacing: 1px;
-}
-
-.instructions span {
-    color: var(--muted);
-    font-size: 9px;
-    letter-spacing: 1px;
+  margin-right: 5px;
 }
 
 
@@ -203,265 +194,337 @@ button:active {
    HUD
 ========================= */
 
-#hud {
-    display: none;
+.hud {
+  position: fixed;
 
-    position: fixed;
-    inset: 0;
+  inset: 0;
 
-    z-index: 10;
+  z-index: 5;
 
-    pointer-events: none;
-}
-
-.hud-top {
-    position: absolute;
-
-    top: 25px;
-    left: 30px;
-    right: 30px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.hud-title {
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -1px;
-}
-
-.hud-title strong {
-    color: var(--accent);
-}
-
-.timer-box {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.timer-box small {
-    color: var(--muted);
-
-    font-size: 8px;
-    letter-spacing: 2px;
-}
-
-.timer-box span {
-    margin-top: 4px;
-
-    font-size: 22px;
-    font-weight: 700;
-
-    font-variant-numeric: tabular-nums;
+  pointer-events: none;
 }
 
 
-/* CROSSHAIR */
+/* TOP BAR */
 
-#crosshair {
-    position: absolute;
+.topbar {
+  display: flex;
 
-    top: 50%;
-    left: 50%;
+  justify-content: space-between;
 
-    transform: translate(-50%, -50%);
+  align-items: flex-start;
 
-    color: rgba(255,255,255,0.85);
-
-    font-size: 18px;
+  padding:
+    25px 28px;
 }
 
+.brand {
+  font-weight: 900;
 
-/* CHECKPOINT */
+  letter-spacing: 2px;
 
-.checkpoint {
-    position: absolute;
-
-    top: 50%;
-    right: 30px;
-
-    transform: translateY(-50%);
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-
-    opacity: 0.7;
+  font-size: 14px;
 }
 
-.checkpoint span {
-    color: var(--muted);
-
-    font-size: 8px;
-    letter-spacing: 2px;
+.brand span {
+  opacity: 0.4;
 }
 
-.checkpoint strong {
-    margin-top: 5px;
+.stats {
+  display: flex;
 
-    color: var(--accent);
+  gap: 26px;
 
-    font-size: 13px;
+  text-align: right;
 }
 
+.stats small {
+  display: block;
 
-/* BOTTOM */
+  font-size: 9px;
 
-.bottom-hud {
-    position: absolute;
+  letter-spacing: 2px;
 
-    bottom: 25px;
-    left: 30px;
-
-    display: flex;
-    gap: 30px;
+  opacity: 0.45;
 }
 
-.bottom-hud div {
-    display: flex;
-    flex-direction: column;
-}
-
-.bottom-hud span {
-    color: var(--muted);
-
-    font-size: 8px;
-    letter-spacing: 2px;
-}
-
-.bottom-hud strong {
-    margin-top: 4px;
-
-    font-size: 13px;
+.stats strong {
+  font-size: 20px;
 }
 
 
 /* =========================
-   COMPLETE
+   CROSSHAIR
 ========================= */
 
-#complete {
-    display: none;
+.crosshair {
+  position: absolute;
 
-    position: fixed;
-    inset: 0;
+  left: 50%;
+  top: 50%;
 
-    z-index: 30;
+  width: 30px;
+  height: 30px;
 
-    align-items: center;
-    justify-content: center;
-
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(140,255,0,0.08),
-            transparent 40%
-        ),
-        rgba(4,6,8,0.95);
+  transform:
+    translate(-50%, -50%);
 }
 
-.complete-content {
-    width: min(600px, calc(100% - 40px));
+.crosshair i {
+  position: absolute;
 
-    text-align: center;
+  background: #ffffff;
+
+  opacity: 0.9;
 }
 
-.complete-label {
-    color: var(--accent);
+.crosshair i:nth-child(1) {
+  width: 9px;
+  height: 2px;
 
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 4px;
+  left: 0;
+  top: 14px;
 }
 
-.complete-content h1 {
-    margin-top: 12px;
+.crosshair i:nth-child(2) {
+  width: 9px;
+  height: 2px;
 
-    font-size: clamp(50px, 9vw, 100px);
-
-    letter-spacing: -5px;
+  right: 0;
+  top: 14px;
 }
 
+.crosshair i:nth-child(3) {
+  height: 9px;
+  width: 2px;
 
-.result {
-    margin: 45px auto 10px;
-
-    display: flex;
-    justify-content: center;
-    gap: 60px;
+  top: 0;
+  left: 14px;
 }
 
-.result div {
-    display: flex;
-    flex-direction: column;
+.crosshair i:nth-child(4) {
+  height: 9px;
+  width: 2px;
+
+  bottom: 0;
+  left: 14px;
 }
 
-.result span {
-    color: var(--muted);
+.crosshair b {
+  position: absolute;
 
-    font-size: 9px;
-    letter-spacing: 2px;
-}
+  width: 3px;
+  height: 3px;
 
-.result strong {
-    margin-top: 7px;
+  border-radius: 50%;
 
-    font-size: 25px;
+  background: #ffffff;
 
-    font-variant-numeric: tabular-nums;
-}
-
-#againButton {
-    margin-top: 40px;
-}
-
-#menuButton {
-    display: block;
-
-    margin: 15px auto 0;
-
-    background: transparent;
-    color: var(--muted);
-
-    border: 1px solid var(--line);
+  left: 14px;
+  top: 14px;
 }
 
 
-/* MOBILE */
+/* =========================
+   WEAPON
+========================= */
 
-@media (max-width: 650px) {
+.weapon {
+  position: absolute;
 
-    .menu-card {
-        flex-wrap: wrap;
-    }
+  right: 28px;
+  bottom: 26px;
 
-    .menu-card button {
-        width: 100%;
-        margin-left: 0;
-    }
+  width: 210px;
+}
 
-    .instructions {
-        gap: 15px;
-    }
+.ammo {
+  font-size: 34px;
 
-    .instructions div {
-        text-align: center;
-    }
+  font-weight: 900;
 
-    .checkpoint {
-        display: none;
-    }
+  text-align: right;
+}
 
-    .hud-top {
-        left: 18px;
-        right: 18px;
-    }
+.ammo span {
+  font-size: 13px;
 
-    .bottom-hud {
-        left: 18px;
-    }
+  opacity: 0.45;
+}
+
+.weapon-name {
+  text-align: right;
+
+  font-size: 10px;
+
+  letter-spacing: 3px;
+
+  opacity: 0.5;
+
+  margin:
+    2px 0 8px;
+}
+
+.bar {
+  height: 3px;
+
+  background:
+    rgba(255, 255, 255, 0.13);
+}
+
+.bar span {
+  display: block;
+
+  height: 100%;
+
+  background: #ffffff;
+
+  width: 100%;
+
+  transition:
+    width 0.1s;
+}
+
+
+/* =========================
+   HEALTH
+========================= */
+
+.health {
+  position: absolute;
+
+  left: 28px;
+  bottom: 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+}
+
+.health > span {
+  font-size: 10px;
+
+  letter-spacing: 2px;
+
+  opacity: 0.55;
+}
+
+.healthbar {
+  width: 170px;
+
+  height: 5px;
+
+  background:
+    rgba(255, 255, 255, 0.14);
+}
+
+.healthbar span {
+  display: block;
+
+  height: 100%;
+
+  background: #ffffff;
+
+  width: 100%;
+
+  transition:
+    width 0.15s;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.message {
+  position: absolute;
+
+  left: 50%;
+  top: 58%;
+
+  transform:
+    translateX(-50%);
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  font-size: 12px;
+
+  text-shadow:
+    0 2px 8px #000000;
+}
+
+
+/* =========================
+   PAUSE / GAME OVER
+========================= */
+
+.overlay {
+  background:
+    rgba(2, 7, 5, 0.62);
+
+  backdrop-filter:
+    blur(8px);
+}
+
+.pause-card h2 {
+  font-size: 42px;
+
+  margin:
+    0 0 10px;
+
+  letter-spacing: 2px;
+}
+
+.pause-card p {
+  opacity: 0.6;
+
+  margin:
+    0 0 25px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .menu-card,
+  .pause-card {
+    padding:
+      34px 24px;
+  }
+
+  .controls {
+    grid-template-columns:
+      1fr;
+  }
+
+  .topbar {
+    padding:
+      16px;
+  }
+
+  .weapon {
+    right: 16px;
+
+    bottom: 20px;
+  }
+
+  .health {
+    left: 16px;
+
+    bottom: 20px;
+  }
+
+  .healthbar {
+    width: 120px;
+  }
 
 }
