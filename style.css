@@ -1,359 +1,258 @@
-```css
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  }
+
+:root {
+--bg: #0b0d10;
+--sidebar: #101318;
+--card: #13171d;
+--card-hover: #181d24;
+--border: #242a33;
+--text: #f1f3f5;
+--muted: #8c949f;
+--accent: #6d8cff;
+--accent-hover: #829dff;
 }
 
-html,
+body.light {
+--bg: #f4f6f8;
+--sidebar: #ffffff;
+--card: #ffffff;
+--card-hover: #f7f8fa;
+--border: #e1e5ea;
+--text: #17191d;
+--muted: #6d7480;
+}
+
 body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #000;
-    font-family: Arial, Helvetica, sans-serif;
-    color: white;
+min-height: 100vh;
+background: var(--bg);
+color: var(--text);
+font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+transition: background 0.25s ease, color 0.25s ease;
 }
 
-body {
-    user-select: none;
+button,
+input {
+font: inherit;
 }
 
-canvas {
-    display: block;
+button {
+cursor: pointer;
 }
 
-/* =========================
-   MAIN MENU
-========================= */
-
-#menu {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background:
-        radial-gradient(circle at center, rgba(40, 55, 75, 0.45), rgba(0, 0, 0, 0.96)),
-        #080b10;
+.sidebar {
+position: fixed;
+top: 0;
+left: 0;
+width: 245px;
+height: 100vh;
+padding: 24px 16px;
+background: var(--sidebar);
+border-right: 1px solid var(--border);
+display: flex;
+flex-direction: column;
+z-index: 10;
 }
 
-.menu-box {
-    width: 520px;
-    max-width: 90%;
-    text-align: center;
-    padding: 50px 35px;
-    background: rgba(8, 12, 18, 0.88);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 18px;
-    box-shadow: 0 25px 80px rgba(0,0,0,0.7);
+.logo {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 4px 8px 28px;
 }
 
-.menu-box h1 {
-    font-size: 64px;
-    letter-spacing: 8px;
-    font-weight: 900;
+.logo-icon {
+width: 38px;
+height: 38px;
+display: grid;
+place-items: center;
+background: var(--card);
+border: 1px solid var(--border);
+border-radius: 10px;
 }
 
-.menu-box h2 {
-    font-size: 32px;
-    letter-spacing: 12px;
-    color: #69d7ff;
-    margin-top: -5px;
+.logo strong {
+display: block;
+font-size: 14px;
 }
 
-.menu-box p {
-    margin-top: 15px;
-    color: #8994a3;
-    letter-spacing: 4px;
+.logo span {
+display: block;
+color: var(--muted);
+font-size: 11px;
+margin-top: 3px;
 }
 
-#startBtn,
-#resumeBtn,
-#restartBtn {
-    width: 280px;
-    padding: 17px;
-    margin-top: 35px;
-    border: 0;
-    border-radius: 9px;
-    background: #4cc9f0;
-    color: #061018;
-    font-size: 18px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: 0.2s;
+nav {
+display: flex;
+flex-direction: column;
+gap: 5px;
 }
 
-#startBtn:hover,
-#resumeBtn:hover,
-#restartBtn:hover {
-    transform: scale(1.04);
-    background: #78ddff;
+.nav-item {
+width: 100%;
+border: 0;
+background: transparent;
+color: var(--muted);
+padding: 11px 12px;
+border-radius: 9px;
+display: flex;
+align-items: center;
+gap: 12px;
+text-align: left;
+font-size: 13px;
+transition: 0.2s ease;
 }
 
-.controls {
-    margin-top: 35px;
-    display: grid;
-    grid-template-columns: auto auto;
-    justify-content: center;
-    gap: 10px 18px;
-    color: #8994a3;
-    font-size: 13px;
+.nav-item span {
+width: 20px;
+text-align: center;
 }
 
-.controls span {
-    color: white;
-    font-weight: bold;
+.nav-item:hover {
+color: var(--text);
+background: var(--card);
 }
 
-/* =========================
-   HUD
-========================= */
-
-#hud {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    pointer-events: none;
+.nav-item.active {
+color: var(--text);
+background: var(--card);
+box-shadow: inset 2px 0 0 var(--accent);
 }
 
-.top-left {
-    position: absolute;
-    top: 25px;
-    left: 25px;
+.sidebar-bottom {
+margin-top: auto;
 }
 
-.health {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 16px;
+.main {
+margin-left: 245px;
+min-height: 100vh;
+padding: 42px;
 }
 
-.health > span {
-    font-weight: 900;
+.page {
+display: none;
+max-width: 1250px;
+margin: auto;
 }
 
-.health-bar {
-    width: 220px;
-    height: 14px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.25);
-    overflow: hidden;
+.page.active {
+display: block;
 }
 
-#healthFill {
-    width: 100%;
-    height: 100%;
-    background: #39e66b;
-    transition: width 0.2s;
+.topbar,
+.page-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 34px;
 }
 
-#healthText {
-    width: 30px;
+.eyebrow {
+color: var(--accent);
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 1.5px;
 }
 
-.top-right {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    text-align: right;
-    font-size: 14px;
-    line-height: 25px;
+h1 {
+font-size: clamp(30px, 4vw, 44px);
+letter-spacing: -1.5px;
+margin-top: 5px;
 }
 
-.top-right b {
-    color: #69d7ff;
-    margin-left: 8px;
+h2 {
+font-size: 18px;
+margin-top: 5px;
 }
 
-/* =========================
-   CROSSHAIR
-========================= */
-
-.crosshair {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 30px;
-    height: 30px;
-    transform: translate(-50%, -50%);
+.subtitle {
+color: var(--muted);
+font-size: 14px;
+margin-top: 7px;
 }
 
-.crosshair::before,
-.crosshair::after,
-.crosshair span::before,
-.crosshair span::after {
-    content: "";
-    position: absolute;
-    background: white;
+.clock {
+text-align: right;
 }
 
-.crosshair::before {
-    width: 2px;
-    height: 9px;
-    left: 14px;
-    top: 0;
+.clock strong {
+display: block;
+font-size: 25px;
+letter-spacing: 1px;
 }
 
-.crosshair::after {
-    width: 2px;
-    height: 9px;
-    left: 14px;
-    bottom: 0;
+.clock span {
+display: block;
+color: var(--muted);
+font-size: 12px;
+margin-top: 4px;
 }
 
-.crosshair span::before {
-    width: 9px;
-    height: 2px;
-    left: 0;
-    top: 14px;
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 15px;
+margin-bottom: 15px;
 }
 
-.crosshair span::after {
-    width: 9px;
-    height: 2px;
-    right: 0;
-    top: 14px;
+.card {
+background: var(--card);
+border: 1px solid var(--border);
+border-radius: 14px;
+padding: 21px;
+transition: 0.2s ease;
 }
 
-/* =========================
-   WEAPON
-========================= */
-
-.weapon {
-    position: absolute;
-    bottom: 25px;
-    right: 35px;
-    text-align: right;
+.card:hover {
+border-color: #303743;
 }
 
-.weapon-name {
-    font-size: 13px;
-    color: #9ca8b7;
-    letter-spacing: 2px;
+.stat-card {
+display: flex;
+align-items: center;
+gap: 14px;
 }
 
-.ammo {
-    margin-top: 2px;
-    font-size: 42px;
-    font-weight: 900;
+.card-icon {
+width: 40px;
+height: 40px;
+display: grid;
+place-items: center;
+background: var(--bg);
+border: 1px solid var(--border);
+border-radius: 10px;
 }
 
-.ammo span {
-    color: #777;
-    font-size: 20px;
+.label {
+display: block;
+color: var(--muted);
+font-size: 11px;
+margin-bottom: 4px;
 }
 
-#reloadText {
-    position: absolute;
-    left: 50%;
-    bottom: 105px;
-    transform: translateX(-50%);
-    display: none;
-    font-weight: bold;
-    letter-spacing: 3px;
+.stat-card strong {
+font-size: 14px;
 }
 
-/* =========================
-   OVERLAYS
-========================= */
-
-#pauseScreen,
-#gameOver {
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.72);
-    backdrop-filter: blur(4px);
+.dashboard-grid {
+display: grid;
+grid-template-columns: 1.3fr 1fr;
+gap: 15px;
 }
 
-.overlay-box {
-    min-width: 360px;
-    padding: 45px;
-    text-align: center;
-    border-radius: 16px;
-    background: rgba(10,15,22,0.95);
-    border: 1px solid rgba(255,255,255,0.12);
+.card-header {
+margin-bottom: 20px;
 }
 
-.overlay-box h1 {
-    font-size: 42px;
-    letter-spacing: 5px;
+.quick-tools {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
 }
 
-.overlay-box p {
-    margin-top: 25px;
-    color: #8994a3;
-}
-
-.overlay-box strong {
-    display: block;
-    margin-top: 5px;
-    font-size: 48px;
-    color: #69d7ff;
-}
-
-.overlay-box button {
-    display: block;
-    width: 250px;
-    margin: 18px auto 0;
-    padding: 14px;
-    border: 0;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    background: #4cc9f0;
-}
-
-#menuBtn,
-#gameMenuBtn {
-    background: #242c36;
-    color: white;
-}
-
-#menuBtn:hover,
-#gameMenuBtn:hover {
-    background: #343f4c;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 600px) {
-
-    .menu-box h1 {
-        font-size: 43px;
-    }
-
-    .menu-box h2 {
-        font-size: 23px;
-    }
-
-    .health-bar {
-        width: 120px;
-    }
-
-    .weapon {
-        right: 15px;
-        bottom: 15px;
-    }
-
-    .ammo {
-        font-size: 32px;
-    }
-
-    .overlay-box {
-        min-width: 280px;
-        padding: 30px;
-    }
-}
-```
+.tool-button {
+display: flex;
