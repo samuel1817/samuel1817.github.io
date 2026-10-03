@@ -3,42 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameZone — 3D Parkour</title>
+    <title>PARKOUR — 3D OBBY</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div id="menu">
-        <h1>GAMEZONE</h1>
-        <p>3D PARKOUR</p>
+    <!-- MAIN MENU -->
+    <main id="menu">
 
-        <button id="startButton">PLAY</button>
-
-        <div class="controls">
-            <span>W A S D</span> Pohyb
-            <span>SPACE</span> Skok
-            <span>MOUSE</span> Otáčanie
+        <div class="logo">
+            <span>PARK</span><strong>OUR</strong>
         </div>
-    </div>
 
+        <p class="subtitle">MASTER THE COURSE</p>
+
+        <div class="menu-card">
+
+            <div class="level-number">01</div>
+
+            <div>
+                <h2>FIRST STEPS</h2>
+                <p>Learn the basics of movement and parkour.</p>
+            </div>
+
+            <button id="playButton">PLAY LEVEL</button>
+
+        </div>
+
+        <div class="instructions">
+            <div><b>W A S D</b><span>MOVE</span></div>
+            <div><b>SHIFT</b><span>SPRINT</span></div>
+            <div><b>SPACE</b><span>JUMP</span></div>
+            <div><b>MOUSE</b><span>LOOK</span></div>
+        </div>
+
+    </main>
+
+
+    <!-- GAME HUD -->
     <div id="hud">
-        <div class="top">
-            <strong>3D PARKOUR</strong>
-            <span>TIME: <b id="timer">0.00</b></span>
+
+        <div class="hud-top">
+
+            <div class="hud-title">
+                <span>PARK</span><strong>OUR</strong>
+            </div>
+
+            <div class="timer-box">
+                <small>TIME</small>
+                <span id="timer">00:00.00</span>
+            </div>
+
         </div>
+
 
         <div id="crosshair">+</div>
 
-        <div id="message"></div>
+
+        <div class="checkpoint">
+            <span>CHECKPOINT</span>
+            <strong id="checkpointNumber">START</strong>
+        </div>
+
+
+        <div class="bottom-hud">
+
+            <div>
+                <span>LEVEL</span>
+                <strong>01</strong>
+            </div>
+
+            <div>
+                <span>BEST</span>
+                <strong id="bestTime">--:--</strong>
+            </div>
+
+        </div>
+
     </div>
 
-    <div id="winScreen">
-        <h1>LEVEL COMPLETE!</h1>
-        <p>Your time</p>
-        <strong id="finalTime">0.00</strong>
-        <button id="restartButton">PLAY AGAIN</button>
+
+    <!-- LEVEL COMPLETE -->
+    <div id="complete">
+
+        <div class="complete-content">
+
+            <div class="complete-label">COURSE COMPLETE</div>
+
+            <h1>FINISHED</h1>
+
+            <div class="result">
+
+                <div>
+                    <span>YOUR TIME</span>
+                    <strong id="finalTime">00:00.00</strong>
+                </div>
+
+                <div>
+                    <span>BEST TIME</span>
+                    <strong id="completeBest">--:--</strong>
+                </div>
+
+            </div>
+
+            <button id="againButton">RUN AGAIN</button>
+
+            <button id="menuButton">MAIN MENU</button>
+
+        </div>
+
     </div>
+
 
     <script type="module" src="script.js"></script>
 
