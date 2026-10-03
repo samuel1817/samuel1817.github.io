@@ -4,108 +4,262 @@
     padding: 0;
 }
 
+:root {
+    --white: #f5f7fa;
+    --muted: #89929d;
+    --dark: #080b0f;
+    --panel: rgba(10, 14, 19, 0.82);
+    --line: rgba(255,255,255,0.12);
+    --accent: #8cff00;
+}
+
+html,
 body {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    background: #000;
-    font-family: Arial, sans-serif;
-    color: white;
 }
 
-canvas {
-    display: block;
+body {
+    background: #080b0f;
+    color: var(--white);
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
-#menu,
-#winScreen {
+
+/* =========================
+   MENU
+========================= */
+
+#menu {
     position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 20;
 
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
     background:
-        radial-gradient(circle at center, rgba(30, 30, 50, 0.7), rgba(0, 0, 0, 0.96));
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(140,255,0,0.08),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #07090c,
+            #10151b
+        );
 }
 
-#menu h1 {
-    font-size: clamp(48px, 10vw, 100px);
+.logo {
+    font-size: clamp(55px, 9vw, 110px);
+    font-weight: 900;
+    letter-spacing: -6px;
+    line-height: 0.8;
+}
+
+.logo span {
+    color: white;
+}
+
+.logo strong {
+    color: var(--accent);
+}
+
+.subtitle {
+    margin-top: 25px;
+
+    color: var(--muted);
+
+    font-size: 12px;
     letter-spacing: 8px;
+    font-weight: 700;
 }
 
-#menu p {
-    margin-top: 5px;
-    font-size: 18px;
-    letter-spacing: 8px;
-    opacity: 0.65;
-}
 
-button {
-    margin-top: 35px;
-    padding: 15px 55px;
+/* MENU CARD */
 
-    border: none;
-    border-radius: 8px;
+.menu-card {
+    width: min(720px, calc(100% - 40px));
 
-    background: white;
-    color: black;
-
-    font-size: 18px;
-    font-weight: bold;
-
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-button:hover {
-    transform: scale(1.05);
-}
-
-.controls {
-    margin-top: 30px;
+    margin-top: 60px;
 
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 25px;
 
-    color: #aaa;
+    padding: 22px;
+
+    background: var(--panel);
+
+    border: 1px solid var(--line);
+    border-radius: 14px;
+
+    backdrop-filter: blur(20px);
+}
+
+.level-number {
+    width: 70px;
+    height: 70px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(140,255,0,0.35);
+    border-radius: 10px;
+
+    color: var(--accent);
+
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.menu-card h2 {
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.menu-card p {
+    margin-top: 7px;
+
+    color: var(--muted);
+
     font-size: 13px;
 }
 
-.controls span {
-    padding: 6px 9px;
-
-    border: 1px solid #555;
-    border-radius: 5px;
-
-    color: white;
-    background: #111;
+.menu-card button {
+    margin-left: auto;
 }
+
+
+/* BUTTONS */
+
+button {
+    border: none;
+
+    padding: 14px 23px;
+
+    border-radius: 8px;
+
+    background: var(--accent);
+    color: #0a0d0b;
+
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s,
+        filter 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+
+/* CONTROLS */
+
+.instructions {
+    display: flex;
+    gap: 35px;
+
+    margin-top: 35px;
+}
+
+.instructions div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.instructions b {
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.instructions span {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+
+/* =========================
+   HUD
+========================= */
 
 #hud {
     display: none;
+
     position: fixed;
     inset: 0;
-    z-index: 5;
+
+    z-index: 10;
 
     pointer-events: none;
 }
 
-.top {
+.hud-top {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
+
+    top: 25px;
+    left: 30px;
+    right: 30px;
 
     display: flex;
     justify-content: space-between;
-
-    font-size: 14px;
-
-    text-shadow: 0 2px 4px black;
+    align-items: center;
 }
+
+.hud-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.hud-title strong {
+    color: var(--accent);
+}
+
+.timer-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.timer-box small {
+    color: var(--muted);
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+.timer-box span {
+    margin-top: 4px;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* CROSSHAIR */
 
 #crosshair {
     position: absolute;
@@ -115,52 +269,199 @@ button:hover {
 
     transform: translate(-50%, -50%);
 
-    font-size: 22px;
-    font-weight: bold;
+    color: rgba(255,255,255,0.85);
 
-    text-shadow: 0 0 5px black;
+    font-size: 18px;
 }
 
-#message {
+
+/* CHECKPOINT */
+
+.checkpoint {
     position: absolute;
-    bottom: 30px;
-    left: 50%;
 
-    transform: translateX(-50%);
+    top: 50%;
+    right: 30px;
 
-    color: #ddd;
-    font-size: 14px;
+    transform: translateY(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    opacity: 0.7;
 }
 
-#winScreen {
+.checkpoint span {
+    color: var(--muted);
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+.checkpoint strong {
+    margin-top: 5px;
+
+    color: var(--accent);
+
+    font-size: 13px;
+}
+
+
+/* BOTTOM */
+
+.bottom-hud {
+    position: absolute;
+
+    bottom: 25px;
+    left: 30px;
+
+    display: flex;
+    gap: 30px;
+}
+
+.bottom-hud div {
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-hud span {
+    color: var(--muted);
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+.bottom-hud strong {
+    margin-top: 4px;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   COMPLETE
+========================= */
+
+#complete {
     display: none;
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 30;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(140,255,0,0.08),
+            transparent 40%
+        ),
+        rgba(4,6,8,0.95);
 }
 
-#winScreen h1 {
-    font-size: clamp(35px, 7vw, 70px);
+.complete-content {
+    width: min(600px, calc(100% - 40px));
+
+    text-align: center;
+}
+
+.complete-label {
+    color: var(--accent);
+
+    font-size: 10px;
+    font-weight: 800;
     letter-spacing: 4px;
 }
 
-#winScreen p {
-    margin-top: 25px;
-    color: #aaa;
+.complete-content h1 {
+    margin-top: 12px;
+
+    font-size: clamp(50px, 9vw, 100px);
+
+    letter-spacing: -5px;
 }
 
-#finalTime {
-    margin-top: 5px;
-    font-size: 45px;
+
+.result {
+    margin: 45px auto 10px;
+
+    display: flex;
+    justify-content: center;
+    gap: 60px;
 }
 
-@media (max-width: 600px) {
+.result div {
+    display: flex;
+    flex-direction: column;
+}
 
-    .controls {
+.result span {
+    color: var(--muted);
+
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.result strong {
+    margin-top: 7px;
+
+    font-size: 25px;
+
+    font-variant-numeric: tabular-nums;
+}
+
+#againButton {
+    margin-top: 40px;
+}
+
+#menuButton {
+    display: block;
+
+    margin: 15px auto 0;
+
+    background: transparent;
+    color: var(--muted);
+
+    border: 1px solid var(--line);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+    .menu-card {
         flex-wrap: wrap;
-        justify-content: center;
-        max-width: 300px;
     }
 
-    #menu h1 {
-        letter-spacing: 4px;
+    .menu-card button {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .instructions {
+        gap: 15px;
+    }
+
+    .instructions div {
+        text-align: center;
+    }
+
+    .checkpoint {
+        display: none;
+    }
+
+    .hud-top {
+        left: 18px;
+        right: 18px;
+    }
+
+    .bottom-hud {
+        left: 18px;
     }
 
 }
