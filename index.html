@@ -4,61 +4,928 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PC Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+
+```
+<meta name="description" content="Personal PC Dashboard">
+
+<title>PC Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+```
+
 </head>
 
 <body>
 
 ```
-<aside class="sidebar">
-    <div class="logo">
-        <div class="logo-icon">🖥️</div>
-        <div>
-            <strong>PC Dashboard</strong>
-            <span>My personal tools</span>
+<!-- PRIVACY / CONSENT SCREEN -->
+<div id="consentScreen" class="consent-screen">
+
+    <div class="consent-box">
+
+        <div class="consent-icon">
+            🖥️
         </div>
+
+        <p class="eyebrow">PC DASHBOARD</p>
+
+        <h1>Before you continue</h1>
+
+        <p class="consent-text">
+            This website uses information that your web browser makes
+            available about your device to display your PC information.
+        </p>
+
+        <div class="consent-info">
+
+            <div>
+                <span>🧠</span>
+                <div>
+                    <strong>Processor information</strong>
+                    <small>Available logical processor count</small>
+                </div>
+            </div>
+
+            <div>
+                <span>💾</span>
+                <div>
+                    <strong>Memory information</strong>
+                    <small>Approximate memory when supported by your browser</small>
+                </div>
+            </div>
+
+            <div>
+                <span>🖥️</span>
+                <div>
+                    <strong>Display information</strong>
+                    <small>Your browser's available screen information</small>
+                </div>
+            </div>
+
+            <div>
+                <span>🌐</span>
+                <div>
+                    <strong>Browser information</strong>
+                    <small>Browser and operating-system information exposed to the page</small>
+                </div>
+            </div>
+
+        </div>
+
+        <p class="consent-note">
+            No information is uploaded to a server by this website.
+            The dashboard processes the available information directly
+            in your browser.
+        </p>
+
+        <div class="consent-buttons">
+
+            <button id="agreeButton" class="primary-button">
+                Agree
+            </button>
+
+            <button id="disagreeButton" class="secondary-button">
+                Disagree
+            </button>
+
+        </div>
+
+        <p id="disagreeMessage" class="disagree-message"></p>
+
     </div>
 
-    <nav>
-        <button class="nav-item active" data-page="dashboard">
-            <span>⌂</span>
-            Dashboard
-        </button>
+</div>
 
-        <button class="nav-item" data-page="pc">
-            <span>🖥️</span>
-            My PC
-        </button>
 
-        <button class="nav-item" data-page="gaming">
-            <span>🎮</span>
-            Gaming
-        </button>
+<!-- MAIN APPLICATION -->
+<div id="app" class="app hidden">
 
-        <button class="nav-item" data-page="shortcuts">
-            <span>⌨️</span>
-            Shortcuts
-        </button>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-        <button class="nav-item" data-page="calculators">
-            <span>🧮</span>
-            Calculators
-        </button>
+        <div class="logo">
 
-        <button class="nav-item" data-page="tools">
-            <span>🛠️</span>
-            Tools
-        </button>
-    </nav>
+            <div class="logo-icon">
+                🖥️
+            </div>
 
-    <div class="sidebar-bottom">
-        <button class="nav-item" id="themeButton">
-            <span>☾</span>
-            Toggle theme
-        </button>
-    </div>
-</aside>
+            <div>
+                <strong>PC Dashboard</strong>
+                <span>Personal PC tools</span>
+            </div>
 
-<main clas
+        </div>
+
+
+        <nav>
+
+            <button class="nav-item active" data-page="dashboard">
+                <span>⌂</span>
+                Dashboard
+            </button>
+
+            <button class="nav-item" data-page="hardware">
+                <span>🖥️</span>
+                Hardware
+            </button>
+
+            <button class="nav-item" data-page="display">
+                <span>🖵</span>
+                Display
+            </button>
+
+            <button class="nav-item" data-page="browser">
+                <span>🌐</span>
+                Browser
+            </button>
+
+            <button class="nav-item" data-page="gaming">
+                <span>🎮</span>
+                Gaming
+            </button>
+
+            <button class="nav-item" data-page="shortcuts">
+                <span>⌨️</span>
+                Shortcuts
+            </button>
+
+            <button class="nav-item" data-page="tools">
+                <span>🛠️</span>
+                Tools
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <button id="themeButton" class="nav-item">
+                <span>☾</span>
+                Theme
+            </button>
+
+            <button id="resetConsentButton" class="nav-item">
+                <span>↻</span>
+                Reset consent
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENT -->
+    <main class="main">
+
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="page active">
+
+            <header class="topbar">
+
+                <div>
+                    <p class="eyebrow">WELCOME</p>
+
+                    <h1>PC Dashboard</h1>
+
+                    <p class="subtitle">
+                        Information your browser can actually provide.
+                    </p>
+                </div>
+
+                <div class="clock">
+
+                    <strong id="clock">
+                        00:00:00
+                    </strong>
+
+                    <span id="date">
+                        Loading...
+                    </span>
+
+                </div>
+
+            </header>
+
+
+            <div class="stats-grid">
+
+                <div class="card stat-card">
+
+                    <div class="card-icon">
+                        🧠
+                    </div>
+
+                    <div>
+                        <span class="label">
+                            LOGICAL PROCESSORS
+                        </span>
+
+                        <strong id="cpuValue">
+                            Detecting...
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="card stat-card">
+
+                    <div class="card-icon">
+                        💾
+                    </div>
+
+                    <div>
+                        <span class="label">
+                            MEMORY
+                        </span>
+
+                        <strong id="memoryValue">
+                            Detecting...
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="card stat-card">
+
+                    <div class="card-icon">
+                        🖥️
+                    </div>
+
+                    <div>
+                        <span class="label">
+                            SCREEN
+                        </span>
+
+                        <strong id="screenValue">
+                            Detecting...
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="card stat-card">
+
+                    <div class="card-icon">
+                        🌐
+                    </div>
+
+                    <div>
+                        <span class="label">
+                            PLATFORM
+                        </span>
+
+                        <strong id="platformValue">
+                            Detecting...
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-grid">
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <p class="eyebrow">
+                            DEVICE
+                        </p>
+
+                        <h2>Detected information</h2>
+
+                    </div>
+
+
+                    <div class="info-list">
+
+                        <div>
+                            <span>Logical processors</span>
+                            <strong id="dashboardCores">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Approx. memory</span>
+                            <strong id="dashboardMemory">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Screen resolution</span>
+                            <strong id="dashboardResolution">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Device pixel ratio</span>
+                            <strong id="dashboardDpr">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Online status</span>
+                            <strong id="dashboardOnline">—</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <p class="eyebrow">
+                            STATUS
+                        </p>
+
+                        <h2>Browser connection</h2>
+
+                    </div>
+
+
+                    <div class="status-box">
+
+                        <div id="onlineIndicator" class="status-dot"></div>
+
+                        <div>
+                            <strong id="onlineText">
+                                Checking...
+                            </strong>
+
+                            <small>
+                                Current browser network status
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-actions">
+
+                        <button class="tool-button" data-page="hardware">
+                            <span>🧠</span>
+                            <div>
+                                <strong>Hardware</strong>
+                                <small>View available hardware data</small>
+                            </div>
+                        </button>
+
+                        <button class="tool-button" data-page="gaming">
+                            <span>🎮</span>
+                            <div>
+                                <strong>Gaming tools</strong>
+                                <small>Useful gaming calculators</small>
+                            </div>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- HARDWARE -->
+        <section id="hardware" class="page">
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">HARDWARE</p>
+
+                    <h1>Hardware</h1>
+
+                    <p class="subtitle">
+                        Only information actually exposed by your browser.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="hardware-grid">
+
+                <div class="card hardware-card">
+
+                    <div class="hardware-icon">
+                        🧠
+                    </div>
+
+                    <span class="label">
+                        LOGICAL PROCESSORS
+                    </span>
+
+                    <strong id="hardwareCores">
+                        —
+                    </strong>
+
+                    <small>
+                        Browser-reported value
+                    </small>
+
+                </div>
+
+
+                <div class="card hardware-card">
+
+                    <div class="hardware-icon">
+                        💾
+                    </div>
+
+                    <span class="label">
+                        DEVICE MEMORY
+                    </span>
+
+                    <strong id="hardwareMemory">
+                        —
+                    </strong>
+
+                    <small>
+                        Approximate value
+                    </small>
+
+                </div>
+
+
+                <div class="card hardware-card">
+
+                    <div class="hardware-icon">
+                        📱
+                    </div>
+
+                    <span class="label">
+                        TOUCH SUPPORT
+                    </span>
+
+                    <strong id="hardwareTouch">
+                        —
+                    </strong>
+
+                    <small>
+                        Browser capability
+                    </small>
+
+                </div>
+
+
+                <div class="card hardware-card">
+
+                    <div class="hardware-icon">
+                        🔌
+                    </div>
+
+                    <span class="label">
+                        CONNECTION
+                    </span>
+
+                    <strong id="hardwareConnection">
+                        —
+                    </strong>
+
+                    <small>
+                        When supported
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="card notice-card">
+
+                <p class="eyebrow">
+                    IMPORTANT
+                </p>
+
+                <h2>Why some PC information is not shown</h2>
+
+                <p>
+                    A normal website cannot reliably read every Windows
+                    hardware detail. This dashboard therefore does not
+                    invent CPU models, GPU models, temperatures,
+                    motherboard information or exact RAM values.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- DISPLAY -->
+        <section id="display" class="page">
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">DISPLAY</p>
+
+                    <h1>Display</h1>
+
+                    <p class="subtitle">
+                        Information available about your screen.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="display-grid">
+
+                <div class="card display-main">
+
+                    <span class="label">
+                        SCREEN RESOLUTION
+                    </span>
+
+                    <strong id="displayResolution">
+                        —
+                    </strong>
+
+                    <small>
+                        Physical screen resolution reported by the browser
+                    </small>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="info-list">
+
+                        <div>
+                            <span>Available width</span>
+                            <strong id="displayAvailWidth">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Available height</span>
+                            <strong id="displayAvailHeight">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Device pixel ratio</span>
+                            <strong id="displayDpr">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Window width</span>
+                            <strong id="displayWindowWidth">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Window height</span>
+                            <strong id="displayWindowHeight">—</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- BROWSER -->
+        <section id="browser" class="page">
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">BROWSER</p>
+
+                    <h1>Browser</h1>
+
+                    <p class="subtitle">
+                        Browser information available to this website.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="card">
+
+                <div class="info-list">
+
+                    <div>
+                        <span>Browser</span>
+                        <strong id="browserName">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Platform</span>
+                        <strong id="browserPlatform">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Language</span>
+                        <strong id="browserLanguage">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Online</span>
+                        <strong id="browserOnline">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Cookies enabled</span>
+                        <strong id="browserCookies">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Screen color depth</span>
+                        <strong id="browserColorDepth">—</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- GAMING -->
+        <section id="gaming" class="page">
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">GAMING</p>
+
+                    <h1>Gaming Tools</h1>
+
+                    <p class="subtitle">
+                        Useful calculators that don't need fake hardware data.
+                    </p>
+
+                </div>
+
+            </header>
+
+
+            <div class="two-column">
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <p class="eyebrow">
+                            CALCULATOR
+                        </p>
+
+                        <h2>eDPI Calculator</h2>
+
+                    </div>
+
+                    <label>
+                        DPI
+                        <input id="dpiInput" type="number" placeholder="800">
+                    </label>
+
+                    <label>
+                        Sensitivity
+                        <input id="sensInput" type="number" step="0.01" placeholder="1">
+                    </label>
+
+                    <button id="edpiButton" class="primary-button">
+                        Calculate
+                    </button>
+
+                    <div id="edpiResult" class="result">
+                        Enter your values.
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <p class="eyebrow">
+                            SCREEN
+                        </p>
+
+                        <h2>Refresh Rate</h2>
+
+                    </div>
+
+                    <p class="tool-description">
+                        Your browser cannot reliably determine the physical
+                        monitor refresh rate, so it is not displayed as fact.
+                    </p>
+
+                    <div class="result">
+                        Use your operating-system display settings to check
+                        the actual refresh rate.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SHORTCUTS -->
+        <section id="shortcuts" class="page">
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">KEYBOARD</p>
+
+                    <h1>Shortcuts</h1>
+
+                    <p class="subtitle">
+                        Useful shortcuts for Windows, Chrome and Minecraft.
+                    </p>
+
+                </div>
+
+            </header>
+
+
+            <div class="shortcuts-grid">
+
+                <div class="card">
+
+                    <h2>Windows</h2>
+
+                    <div class="shortcut">
+                        <span>Settings</span>
+                        <kbd>Win</kbd> + <kbd>I</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>File Explorer</span>
+                        <kbd>Win</kbd> + <kbd>E</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Task Manager</span>
+                        <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Lock PC</span>
+                        <kbd>Win</kbd> + <kbd>L</kbd>
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h2>Chrome</h2>
+
+                    <div class="shortcut">
+                        <span>New tab</span>
+                        <kbd>Ctrl</kbd> + <kbd>T</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Close tab</span>
+                        <kbd>Ctrl</kbd> + <kbd>W</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>History</span>
+                        <kbd>Ctrl</kbd> + <kbd>H</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Downloads</span>
+                        <kbd>Ctrl</kbd> + <kbd>J</kbd>
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h2>Minecraft</h2>
+
+                    <div class="shortcut">
+                        <span>Coordinates</span>
+                        <kbd>F3</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Perspective</span>
+                        <kbd>F5</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Inventory</span>
+                        <kbd>E</kbd>
+                    </div>
+
+                    <div class="shortcut">
+                        <span>Chat</span>
+                        <kbd>T</kbd>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TOOLS -->
+        <section id="tools" class="page">
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">TOOLS</p>
+
+                    <h1>Tools</h1>
+
+                    <p class="subtitle">
+                        Small tools that work entirely in your browser.
+                    </p>
+
+                </div>
+
+            </header>
+
+
+            <div class="two-column">
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <p class="eyebrow">
+                            TIME
+                        </p>
+
+                        <h2>Stopwatch</h2>
+
+                    </div>
+
+                    <div id="stopwatch" class="stopwatch">
+                        00:00:00
+                    </div>
+
+                    <div class="button-row">
+
+                        <button id="startStopwatch" class="primary-button">
+                            Start
+                        </button>
+
+                        <button id="resetStopwatch" class="secondary-button">
+                            Reset
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <p class="eyebrow">
+                            SECURITY
+                        </p>
+
+                        <h2>Password Generator</h2>
+
+                    </div>
+
+                    <div id="passwordOutput" class="password-output">
+                        Click generate
+                    </div>
+
+                    <button id="generatePassword" class="primary-button">
+                        Generate password
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="script.js"></script>
 ```
+
+</body>
+</html>
